@@ -1,8 +1,8 @@
 import curses
-from curses import wrapper
+from curses import newwin, wrapper
 import time
 import random
-
+import Generator
 
 def start_screen(stdscr):
 	stdscr.clear()
@@ -12,21 +12,30 @@ def start_screen(stdscr):
 	stdscr.getkey()
 
 def display_text(stdscr, target, current, wpm=0):
+	# text_window = curses.newwin(curses.COLS, 20, 0, 0)
+	# box(text_window)
 	stdscr.addstr(target)
-	stdscr.addstr(1, 0, f"WPM: {wpm}")
-
+	stdscr.addstr(f"\nWPM: {wpm}")
+	stdscr.move(0, 0)
 	for i, char in enumerate(current):
 		correct_char = target[i]
 		color = curses.color_pair(1)
 		if char != correct_char:
 			color = curses.color_pair(2)
-
-		stdscr.addstr(0, i, char, color)
+		try:
+			stdscr.addstr(char, color)
+		except curses.error:
+			pass
 
 def load_text():
-	with open("text.txt", "r") as f:
-		lines = f.readlines()
-		return random.choice(lines).strip()
+	gen = Generator.Generator()
+	wordlist = gen.generateWords(60)
+	words = ' '.join(x for x in wordlist)
+	return words
+	# print(wordlist)
+	# with open("text.txt", "r") as f:
+	# 	lines = f.readlines()
+	# 	return random.choice(lines).strip()
 
 def wpm_test(stdscr):
 	target_text = load_text()
@@ -70,6 +79,7 @@ def main(stdscr):
 	start_screen(stdscr)
 	while True:
 		wpm_test(stdscr)
+		stdscr.clear()
 		stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
 		key = stdscr.getkey()
 		
