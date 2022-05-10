@@ -3,6 +3,9 @@ from curses import newwin, wrapper
 import time
 import random
 import Generator
+from UserData import UserData
+
+user_data = UserData()
 
 def start_screen(stdscr):
 	stdscr.clear()
@@ -19,10 +22,70 @@ def menu(stdscr):
 	stdscr.addstr("2. Escribe una frase aleatoria\n")
 	stdscr.addstr("3. Por límite de tiempo\n")
 	stdscr.addstr("4. Escribe un libro\n")
-	stdscr.addstr("5. Salir\n")
+	stdscr.addstr("5. Configuracion\n")
+	stdscr.addstr("6. Salir\n")
 
 	key = stdscr.getkey()
 	return key
+
+def config_menu(stdscr):
+	stdscr.clear()
+	stdscr.addstr("CONFIGURACION\n")
+	stdscr.addstr("1. Cambiar límite de palabras\n")
+	stdscr.addstr("2. Cambiar límite de tiempo\n")
+	stdscr.addstr("3. Regresar")
+
+	key = stdscr.getkey()
+	return key
+
+def get_input(stdscr, limit):
+	count = 0
+	text = ""
+	while count < limit:
+		key = stdscr.getkey()
+
+		if ord(key) == 10 or ord(key) == 13: # Enter
+			break
+
+		stdscr.addstr(key)
+		text += key
+		count += 1
+
+	stdscr.addstr(2, 0, "\nPresiona cualquier tecla para guardar...")
+	stdscr.getkey()
+	return text
+
+def configuration(stdscr):
+	key = config_menu(stdscr)
+
+	while key != "3":
+		if key == "1":
+			stdscr.clear()
+			stdscr.addstr("Límite actual: ")
+			stdscr.addstr(str(user_data.get_word_limit()))
+			stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			s = get_input(stdscr, 3)
+
+			try:
+				user_data.update_word_limit(int(s))
+			except:
+				stdscr.addstr("\nError. Debes ingresar un número")
+				stdscr.getkey()
+
+		if key == "2":
+			stdscr.clear()
+			stdscr.addstr("Límite actual: ")
+			stdscr.addstr(str(user_data.get_time_limit()))
+			stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			s = get_input(stdscr, 3)
+
+			try:
+				user_data.update_time_limit(int(s))
+			except:
+				stdscr.addstr("\nError. Debes ingresar un número")
+				stdscr.getkey()
+
+		key = config_menu(stdscr)
 
 def display_text(stdscr, target, current, wpm=0):
 	# text_window = curses.newwin(curses.COLS, 20, 0, 0)
@@ -96,7 +159,7 @@ def main(stdscr):
 	start_screen(stdscr)
 	modo = menu(stdscr)
 
-	while modo != "5":
+	while modo != "6":
 		if modo == "1":
 			wpm_test(stdscr, modo)
 			stdscr.clear()
@@ -120,6 +183,10 @@ def main(stdscr):
 			stdscr.addstr("MODO: escribe un libro")
 			stdscr.addstr("\nPress any key to continue...")
 			stdscr.getkey()
+
+		if modo == "5":
+			configuration(stdscr)
+			stdscr.clear()
 			
 		modo = menu(stdscr)
 
