@@ -16,9 +16,10 @@ def menu(stdscr):
 	stdscr.addstr("MENÚ\n")
 	stdscr.addstr("Escoge una modalidad\n")
 	stdscr.addstr("1. Por cantidad de palabras\n")
-	stdscr.addstr("2. Por límite de tiempo\n")
-	stdscr.addstr("3. Escribe un libro\n")
-	stdscr.addstr("4. Salir\n")
+	stdscr.addstr("2. Escribe una frase aleatoria\n")
+	stdscr.addstr("3. Por límite de tiempo\n")
+	stdscr.addstr("4. Escribe un libro\n")
+	stdscr.addstr("5. Salir\n")
 
 	key = stdscr.getkey()
 	return key
@@ -39,18 +40,21 @@ def display_text(stdscr, target, current, wpm=0):
 		except curses.error:
 			pass
 
-def load_text():
-	gen = Generator.Generator()
-	wordlist = gen.generateWords(4)
-	words = ' '.join(x for x in wordlist)
-	return words
-	# print(wordlist)
-	# with open("text.txt", "r") as f:
-	# 	lines = f.readlines()
-	# 	return random.choice(lines).strip()
+def load_text(modo):
+	if modo == "1":
+		gen = Generator.Generator()
+		wordlist = gen.generateWords(4)
+		words = ' '.join(x for x in wordlist)
+		return words
+	elif modo == "2":
+		with open("text.txt", "r") as f:
+			lines = f.readlines()
+			return random.choice(lines).strip()
+	
+	return 0
 
-def wpm_test(stdscr):
-	target_text = load_text()
+def wpm_test(stdscr, modo):
+	target_text = load_text(modo)
 	current_text = []
 	wpm = 0
 	start_time = time.time()
@@ -92,20 +96,26 @@ def main(stdscr):
 	start_screen(stdscr)
 	modo = menu(stdscr)
 
-	while modo != "4":
+	while modo != "5":
 		if modo == "1":
-			wpm_test(stdscr)
+			wpm_test(stdscr, modo)
+			stdscr.clear()
+			stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
+			stdscr.getkey()
+		
+		if modo == "2":
+			wpm_test(stdscr, modo)
 			stdscr.clear()
 			stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 			
-		if modo == "2":
+		if modo == "3":
 			stdscr.clear()
 			stdscr.addstr("MODO: por límite de tiempo")
 			stdscr.addstr("\nPress any key to continue...")
 			stdscr.getkey()
 
-		if modo == "3":
+		if modo == "4":
 			stdscr.clear()
 			stdscr.addstr("MODO: escribe un libro")
 			stdscr.addstr("\nPress any key to continue...")
