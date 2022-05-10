@@ -11,6 +11,18 @@ def start_screen(stdscr):
 	stdscr.refresh()
 	stdscr.getkey()
 
+def menu(stdscr):
+	stdscr.clear()
+	stdscr.addstr("MENÚ\n")
+	stdscr.addstr("Escoge una modalidad\n")
+	stdscr.addstr("1. Por cantidad de palabras\n")
+	stdscr.addstr("2. Por límite de tiempo\n")
+	stdscr.addstr("3. Escribe un libro\n")
+	stdscr.addstr("4. Salir\n")
+
+	key = stdscr.getkey()
+	return key
+
 def display_text(stdscr, target, current, wpm=0):
 	# text_window = curses.newwin(curses.COLS, 20, 0, 0)
 	# box(text_window)
@@ -29,7 +41,7 @@ def display_text(stdscr, target, current, wpm=0):
 
 def load_text():
 	gen = Generator.Generator()
-	wordlist = gen.generateWords(60)
+	wordlist = gen.generateWords(4)
 	words = ' '.join(x for x in wordlist)
 	return words
 	# print(wordlist)
@@ -62,6 +74,7 @@ def wpm_test(stdscr):
 			continue
 
 		if ord(key) == 27:
+			stdscr.nodelay(False)
 			break
 
 		if key in ("KEY_BACKSPACE", '\b', "\x7f"):
@@ -77,13 +90,27 @@ def main(stdscr):
 	curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
 	start_screen(stdscr)
-	while True:
-		wpm_test(stdscr)
-		stdscr.clear()
-		stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
-		key = stdscr.getkey()
-		
-		if ord(key) == 27:
-			break
+	modo = menu(stdscr)
+
+	while modo != "4":
+		if modo == "1":
+			wpm_test(stdscr)
+			stdscr.clear()
+			stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
+			stdscr.getkey()
+			
+		if modo == "2":
+			stdscr.clear()
+			stdscr.addstr("MODO: por límite de tiempo")
+			stdscr.addstr("\nPress any key to continue...")
+			stdscr.getkey()
+
+		if modo == "3":
+			stdscr.clear()
+			stdscr.addstr("MODO: escribe un libro")
+			stdscr.addstr("\nPress any key to continue...")
+			stdscr.getkey()
+			
+		modo = menu(stdscr)
 
 wrapper(main)
