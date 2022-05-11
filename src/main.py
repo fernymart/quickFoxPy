@@ -3,12 +3,15 @@ from curses import newwin, wrapper
 import time
 import random
 import Generator
+from UserData import UserData
+
+user_data = UserData()
 
 # errors = 0
 def save_results(wpm):
 	if(wpm > 0):
 		with open("../files/results.txt", "a") as file:
-			file.write(f"{wpm} \n")
+			file.write(f"{wpm}\n")
 
 def start_screen(stdscr):
 	stdscr.clear()
@@ -25,11 +28,71 @@ def menu(stdscr):
 	stdscr.addstr("2. Escribe una frase aleatoria\n")
 	stdscr.addstr("3. Por límite de tiempo\n")
 	stdscr.addstr("4. Escribe un libro\n")
-	stdscr.addstr("5. Ver estadisticas\n")
-	stdscr.addstr("6. Salir\n")
+	stdscr.addstr("5. Configuración\n")
+	stdscr.addstr("6. Estadísticas\n")
+	stdscr.addstr("7. Salir\n")
 
 	key = stdscr.getkey()
 	return key
+
+def config_menu(stdscr):
+	stdscr.clear()
+	stdscr.addstr("CONFIGURACION\n")
+	stdscr.addstr("1. Cambiar límite de palabras\n")
+	stdscr.addstr("2. Cambiar límite de tiempo\n")
+	stdscr.addstr("3. Regresar")
+
+	key = stdscr.getkey()
+	return key
+
+def get_input(stdscr, limit):
+	count = 0
+	text = ""
+	while count < limit:
+		key = stdscr.getkey()
+
+		if ord(key) == 10 or ord(key) == 13: # Enter
+			break
+
+		stdscr.addstr(key)
+		text += key
+		count += 1
+
+	stdscr.addstr(2, 0, "\nPresiona cualquier tecla para guardar...")
+	stdscr.getkey()
+	return text
+
+def configuration(stdscr):
+	key = config_menu(stdscr)
+
+	while key != "3":
+		if key == "1":
+			stdscr.clear()
+			stdscr.addstr("Límite actual: ")
+			stdscr.addstr(str(user_data.get_word_limit()))
+			stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			s = get_input(stdscr, 3)
+
+			try:
+				user_data.update_word_limit(int(s))
+			except:
+				stdscr.addstr("\nError. Debes ingresar un número")
+				stdscr.getkey()
+
+		if key == "2":
+			stdscr.clear()
+			stdscr.addstr("Límite actual: ")
+			stdscr.addstr(str(user_data.get_time_limit()))
+			stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			s = get_input(stdscr, 3)
+
+			try:
+				user_data.update_time_limit(int(s))
+			except:
+				stdscr.addstr("\nError. Debes ingresar un número")
+				stdscr.getkey()
+
+		key = config_menu(stdscr)
 
 def display_text(stdscr, target, current, wpm=0):
 	# text_window = curses.newwin(curses.COLS, 20, 0, 0)
@@ -52,7 +115,7 @@ def display_text(stdscr, target, current, wpm=0):
 def load_text(modo):
 	if modo == "1":
 		gen = Generator.Generator()
-		wordlist = gen.generateWords(4)
+		wordlist = gen.generateWords(user_data.get_word_limit())
 		words = ' '.join(x for x in wordlist)
 		return words
 	elif modo == "2":
@@ -116,7 +179,7 @@ def main(stdscr):
 	modo = menu(stdscr)
 	total_wpm = 0
 
-	while modo != "6":
+	while modo != "7":
 		if modo == "1":
 			total_wpm = wpm_test(stdscr, modo)
 			stdscr.clear()
@@ -148,13 +211,17 @@ def main(stdscr):
 			stdscr.getkey()
 
 		if modo == "5":
+			configuration(stdscr)
+			stdscr.clear()
+		
+		if modo == "6":
 			stdscr.clear()
 			stdscr.addstr(1, 0, "Estadisticas historicas")
 			display_estadisticas(stdscr)
 			# stdscr.addstr(1, 0, "Estadisticas historicas")
 			stdscr.addstr(3, 0, "\nPress any key to continue...")
 			stdscr.getkey()
-			
+
 		modo = menu(stdscr)
 	
 
