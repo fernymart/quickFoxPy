@@ -4,6 +4,12 @@ import time
 import random
 import Generator
 
+# errors = 0
+def save_results(wpm):
+	if(wpm > 0):
+		with open("../files/results.txt", "a") as file:
+			file.write(f"{wpm} \n")
+
 def start_screen(stdscr):
 	stdscr.clear()
 	stdscr.addstr("Welcome to the Speed Typing Test!")
@@ -19,7 +25,8 @@ def menu(stdscr):
 	stdscr.addstr("2. Escribe una frase aleatoria\n")
 	stdscr.addstr("3. Por límite de tiempo\n")
 	stdscr.addstr("4. Escribe un libro\n")
-	stdscr.addstr("5. Salir\n")
+	stdscr.addstr("5. Ver estadisticas\n")
+	stdscr.addstr("6. Salir\n")
 
 	key = stdscr.getkey()
 	return key
@@ -27,6 +34,7 @@ def menu(stdscr):
 def display_text(stdscr, target, current, wpm=0):
 	# text_window = curses.newwin(curses.COLS, 20, 0, 0)
 	# box(text_window)
+	# global errors
 	stdscr.addstr(target)
 	stdscr.addstr(f"\nWPM: {wpm}")
 	stdscr.move(0, 0)
@@ -35,6 +43,7 @@ def display_text(stdscr, target, current, wpm=0):
 		color = curses.color_pair(1)
 		if char != correct_char:
 			color = curses.color_pair(2)
+			# errors+=1
 		try:
 			stdscr.addstr(char, color)
 		except curses.error:
@@ -70,7 +79,8 @@ def wpm_test(stdscr, modo):
 
 		if "".join(current_text) == target_text:
 			stdscr.nodelay(False)
-			break
+			return wpm
+			# break
 
 		try:
 			key = stdscr.getkey()
@@ -87,6 +97,15 @@ def wpm_test(stdscr, modo):
 		elif len(current_text) < len(target_text):
 			current_text.append(key)
 
+def display_estadisticas(stdscr):
+	promedio = 0
+	suma = 0
+	with open("../files/results.txt", "r") as file:
+		resultados = file.readlines()
+		for resultado in resultados:
+			suma+=float(resultado)
+		promedio = suma / len(resultados)
+	stdscr.addstr(2, 0, f"Promedio: {promedio} wpm")
 
 def main(stdscr):
 	curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -95,18 +114,25 @@ def main(stdscr):
 
 	start_screen(stdscr)
 	modo = menu(stdscr)
+	total_wpm = 0
 
-	while modo != "5":
+	while modo != "6":
 		if modo == "1":
-			wpm_test(stdscr, modo)
+			total_wpm = wpm_test(stdscr, modo)
 			stdscr.clear()
-			stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
+			save_results(total_wpm)
+			stdscr.addstr(1,0,f"Your speed was: {total_wpm} wpm")
+			# stdscr.addstr(2,0,f"You had {errors} errors")
+			stdscr.addstr(3, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 		
 		if modo == "2":
-			wpm_test(stdscr, modo)
+			total_wpm = wpm_test(stdscr, modo)
 			stdscr.clear()
-			stdscr.addstr(2, 0, "You completed the text! Press any key to continue...")
+			save_results(total_wpm)
+			stdscr.addstr(1,0,f"Your speed was: {total_wpm} wpm")
+			# stdscr.addstr(2,0,f"You had {errors} errors")
+			stdscr.addstr(3, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 			
 		if modo == "3":
@@ -120,7 +146,17 @@ def main(stdscr):
 			stdscr.addstr("MODO: escribe un libro")
 			stdscr.addstr("\nPress any key to continue...")
 			stdscr.getkey()
+
+		if modo == "5":
+			stdscr.clear()
+			stdscr.addstr(1, 0, "Estadisticas historicas")
+			display_estadisticas(stdscr)
+			# stdscr.addstr(1, 0, "Estadisticas historicas")
+			stdscr.addstr(3, 0, "\nPress any key to continue...")
+			stdscr.getkey()
 			
 		modo = menu(stdscr)
+	
+
 
 wrapper(main)
