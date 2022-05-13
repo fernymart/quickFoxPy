@@ -20,6 +20,13 @@ class UserData():
         self.data["time_limit"] = limit
         self.update_file()
 
+    def get_books(self):
+        return self.data["books"]
+    
+    def update_written_words(self, book, value):
+        self.data["books"][book]["written"] += value
+        self.update_file()
+
     def update_file(self):
         jsonFile = open(self.file_name, "w+")
         jsonFile.write(json.dumps(self.data))
