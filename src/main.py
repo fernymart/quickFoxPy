@@ -82,11 +82,11 @@ def skip_lines(lines, skip_words):
 			count += len(words)
 			continue
 
-		elif count < skip_words and count + len(words) > skip_words: # queda en medio de una linea
+		elif count + len(words) > skip_words: # queda en medio de una linea
 			lines_skipped += 1
 			for word in words:
 				count += 1
-				if count >= skip_words:
+				if count > skip_words:
 					extra_text += word + " "
 			break
 
@@ -102,7 +102,7 @@ def write_book(stdscr, book):
 
 	lines_skipped, extra_text = skip_lines(lines, skip_words)
 
-	start_line = lines_skipped + 1
+	start_line = lines_skipped
 	target_text = extra_text + " ".join(lines[start_line:start_line + show_lines]).replace("\n", "")
 	current_text = []
 
@@ -139,6 +139,8 @@ def write_book(stdscr, book):
 			break
 
 		if key in ("KEY_BACKSPACE", '\b', "\x7f"):
+			if ord(current_text[-1]) == 32: # si borra un espacio, restar una palabra para no contarla doble
+				words -= 1
 			if len(current_text) > 0:
 				current_text.pop()
 		elif len(current_text) < len(target_text):
