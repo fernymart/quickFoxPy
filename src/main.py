@@ -1,11 +1,13 @@
 import curses
 from curses import newwin, wrapper
+from re import S
 import time
 import random
 import Generator
 from UserData import UserData
 
 user_data = UserData()
+books = user_data.get_books()
 
 # errors = 0
 def save_results(wpm):
@@ -40,10 +42,111 @@ def config_menu(stdscr):
 	stdscr.addstr("CONFIGURACION\n")
 	stdscr.addstr("1. Cambiar límite de palabras\n")
 	stdscr.addstr("2. Cambiar límite de tiempo\n")
-	stdscr.addstr("3. Regresar")
+	stdscr.addstr("3. Regresar\n")
 
 	key = stdscr.getkey()
 	return key
+
+def book_menu(stdscr):
+	stdscr.clear()
+	stdscr.addstr("LIBROS\n")
+
+	for i in range(0, len(books)):
+		text = str(i+1) + ". " + books[i]["title"] + " ({:.4f})\n".format(books[i]["written"] / float(books[i]["total_words"]))
+		stdscr.addstr(text)
+
+	back_opt = len(books) + 1
+	text = str(back_opt) + ". Regresar\n"
+	stdscr.addstr(text)
+
+	key = stdscr.getkey()
+
+	if key == str(back_opt):
+		return -1
+
+	return int(key) - 1
+
+def skip_lines(lines, skip_words):
+	lines_skipped = 0
+	extra_text = ""
+	count = 0
+
+	for line in lines:
+		words = line.split()
+
+		if count == skip_words: 
+			break
+
+		if count + len(words) <= skip_words: # salta linea completa
+			lines_skipped += 1
+			count += len(words)
+			continue
+
+		elif count + len(words) > skip_words: # queda en medio de una linea
+			lines_skipped += 1
+			for word in words:
+				count += 1
+				if count > skip_words:
+					extra_text += word + " "
+			break
+
+	return (lines_skipped, extra_text)
+
+def write_book(stdscr, book):
+	show_lines = 1
+	file_name = books[int(book)]["file_name"]
+	file = open("books/" + file_name, "r", encoding="utf8")
+	lines = file.readlines()
+	file.close()
+	skip_words = books[int(book)]["written"]
+
+	lines_skipped, extra_text = skip_lines(lines, skip_words)
+
+	start_line = lines_skipped
+	target_text = extra_text + " ".join(lines[start_line:start_line + show_lines]).replace("\n", "")
+	current_text = []
+
+	start_time = time.time()
+	wpm = 0
+	start_line += show_lines
+	words = 0
+
+	while True:
+		time_elapsed = max(time.time() - start_time, 1)
+		wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
+
+		stdscr.clear()
+		display_text(stdscr, target_text, current_text, wpm)
+		stdscr.refresh()
+
+		if "".join(current_text) == target_text.strip():
+			current_text = []
+			target_text = " ".join(lines[start_line:start_line + show_lines]).replace("\n", "")
+			start_line += show_lines
+			stdscr.clear()
+			continue
+
+		try:
+			key = stdscr.getkey()
+		except:
+			continue
+
+		if ord(key) == 32:
+			words += 1
+
+		if ord(key) == 27:
+			stdscr.nodelay(False)
+			break
+
+		if key in ("KEY_BACKSPACE", '\b', "\x7f"):
+			if ord(current_text[-1]) == 32: # si borra un espacio, restar una palabra para no contarla doble
+				words -= 1
+			if len(current_text) > 0:
+				current_text.pop()
+		elif len(current_text) < len(target_text):
+			current_text.append(key)
+
+	user_data.update_written_words(int(book), words)
 
 def get_input(stdscr, limit):
 	count = 0
@@ -205,10 +308,14 @@ def main(stdscr):
 			stdscr.getkey()
 
 		if modo == "4":
-			stdscr.clear()
-			stdscr.addstr("MODO: escribe un libro")
-			stdscr.addstr("\nPress any key to continue...")
-			stdscr.getkey()
+			book = book_menu(stdscr)
+
+			if book != -1:
+				write_book(stdscr, book)
+				stdscr.clear()
+				stdscr.addstr("\nPress any key to continue...")
+				stdscr.getkey()
+				stdscr.clear()
 
 		if modo == "5":
 			configuration(stdscr)
