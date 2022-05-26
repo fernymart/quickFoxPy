@@ -95,7 +95,7 @@ def skip_lines(lines, skip_words):
 def write_book(stdscr, book):
 	show_lines = 1
 	file_name = books[int(book)]["file_name"]
-	file = open("books/" + file_name, "r", encoding="utf8")
+	file = open("books/" + file_name, "r", encoding="utf-8-sig")
 	lines = file.readlines()
 	file.close()
 	skip_words = books[int(book)]["written"]
@@ -103,7 +103,7 @@ def write_book(stdscr, book):
 	lines_skipped, extra_text = skip_lines(lines, skip_words)
 
 	start_line = lines_skipped
-	target_text = extra_text + " ".join(lines[start_line:start_line + show_lines]).replace("\n", "")
+	target_text = extra_text + " ".join(lines[start_line:start_line + show_lines]).replace("\n", "") + " "
 	current_text = []
 
 	start_time = time.time()
@@ -119,7 +119,7 @@ def write_book(stdscr, book):
 		display_text(stdscr, target_text, current_text, wpm)
 		stdscr.refresh()
 
-		if "".join(current_text) == target_text.strip():
+		if "".join(current_text) == target_text:
 			current_text = []
 			target_text = " ".join(lines[start_line:start_line + show_lines]).replace("\n", "")
 			start_line += show_lines
@@ -139,7 +139,7 @@ def write_book(stdscr, book):
 			break
 
 		if key in ("KEY_BACKSPACE", '\b', "\x7f"):
-			if ord(current_text[-1]) == 32: # si borra un espacio, restar una palabra para no contarla doble
+			if len(current_text) > 0 and ord(current_text[-1]) == 32: # si borra un espacio, restar una palabra para no contarla doble
 				words -= 1
 			if len(current_text) > 0:
 				current_text.pop()
