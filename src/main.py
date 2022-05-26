@@ -5,9 +5,11 @@ import time
 import random
 import Generator
 from UserData import UserData
+from connection import GameDB
 
 user_data = UserData()
 books = user_data.get_books()
+game_db = GameDB()
 
 # errors = 0
 def save_results(wpm):
@@ -42,7 +44,8 @@ def config_menu(stdscr):
 	stdscr.addstr("CONFIGURACION\n")
 	stdscr.addstr("1. Cambiar límite de palabras\n")
 	stdscr.addstr("2. Cambiar límite de tiempo\n")
-	stdscr.addstr("3. Regresar\n")
+	stdscr.addstr("3. Cambiar nombre de usuario\n")
+	stdscr.addstr("4. Regresar\n")
 
 	key = stdscr.getkey()
 	return key
@@ -153,22 +156,23 @@ def get_input(stdscr, limit):
 	text = ""
 	while count < limit:
 		key = stdscr.getkey()
-
+		
 		if ord(key) == 10 or ord(key) == 13: # Enter
 			break
 
-		stdscr.addstr(key)
-		text += key
-		count += 1
+		if ( ord(key.upper()) >= 65 and ord(key.upper()) <= 90 ) or ( ord(key) >= 48 and ord(key) <= 57 ): # letra o numero
+			stdscr.addstr(key)
+			text += key
+			count += 1
 
-	stdscr.addstr(2, 0, "\nPresiona cualquier tecla para guardar...")
+	stdscr.addstr("\n\nPresiona cualquier tecla para guardar...")
 	stdscr.getkey()
 	return text
 
 def configuration(stdscr):
 	key = config_menu(stdscr)
 
-	while key != "3":
+	while key != "4":
 		if key == "1":
 			stdscr.clear()
 			stdscr.addstr("Límite actual: ")
@@ -193,6 +197,59 @@ def configuration(stdscr):
 				user_data.update_time_limit(int(s))
 			except:
 				stdscr.addstr("\nError. Debes ingresar un número")
+				stdscr.getkey()
+
+		if key == "3":
+			stdscr.clear()
+			id, user = user_data.get_user()
+			if id is None:
+				stdscr.addstr("Crea tu nombre de usuario (max. 10 caracteres): ")
+
+				while id is None:
+					newuser = get_input(stdscr, 10)
+					newuser = newuser.strip()
+					stdscr.clear()
+
+					if newuser == "": 
+						stdscr.addstr("Error. Ingresa otro nombre")
+						stdscr.addstr("\nNombre: ")
+						continue
+
+					id = game_db.add_username(newuser)
+
+					if id is None:
+						stdscr.addstr("Error. Ingresa otro nombre")
+						stdscr.addstr("\nNombre: ")
+					else:
+						user_data.save_user(id, newuser)
+
+				stdscr.addstr("\nUsuario registrado correctamente.")
+				stdscr.getkey()
+
+			else:
+				stdscr.addstr("Tu nombre de usuario actual es ")
+				stdscr.addstr(user)
+				stdscr.addstr("\n\nIngresa tu nuevo nombre (max. 10 caracteres): ")
+				newuser = get_input(stdscr, 10)
+				newuser = newuser.strip()
+				updated = game_db.change_username(id, newuser)
+
+				while not updated:
+					stdscr.clear()
+					stdscr.addstr("Error. Ingresa otro nombre")
+					stdscr.addstr("\nTu nombre de usuario actual es ")
+					stdscr.addstr(user)
+					stdscr.addstr("\n\nNuevo nombre: ")
+					newuser = get_input(stdscr, 10)
+					newuser = newuser.strip()
+
+					if newuser == "": 
+						continue
+					updated = game_db.change_username(id, newuser)
+
+				user_data.save_user(id, newuser)
+
+				stdscr.addstr("\nNombre de usuario cambiado correctamente.")
 				stdscr.getkey()
 
 		key = config_menu(stdscr)

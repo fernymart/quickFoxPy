@@ -6,6 +6,11 @@ class UserData():
         with open(self.file_name, "r") as jsonFile:
             self.data = json.load(jsonFile)
 
+    def get_user(self):
+        if "id" not in self.data:
+            return None, None
+        return self.data["id"], self.data["username"]
+
     def save_user(self, id, username):
         self.data["username"] = username
         self.data["id"] = id

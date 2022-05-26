@@ -14,7 +14,7 @@ class GameDB:
             user = users.find_one(data)
 
             if user:
-                return False
+                return None
             
             id = users.insert_one(data).inserted_id
             return str(id)
@@ -25,7 +25,14 @@ class GameDB:
             users = db['users']
             find = { '_id' : ObjectId(id) }
             newdata = {'username': username }
+
+            user = users.find_one(newdata)
+
+            if user:
+                return False
+
             users.update_one(find, {"$set": newdata })
+            return True
 
     def post_stats(self, userid, stat):
         with pymongo.MongoClient(self.uri) as client:
