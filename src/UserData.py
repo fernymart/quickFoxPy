@@ -6,6 +6,11 @@ class UserData():
         with open(self.file_name, "r") as jsonFile:
             self.data = json.load(jsonFile)
 
+    def save_user(self, id, username):
+        self.data["username"] = username
+        self.data["id"] = id
+        self.update_file()
+
     def get_word_limit(self):
         return self.data["word_limit"]
 
