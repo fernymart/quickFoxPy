@@ -410,7 +410,7 @@ def main(stdscr):
 					game_db.post_stats(id, promedio)
 					percentage = game_db.get_stats(promedio)
 
-					stdscr.addstr(f"\n\nTe encuentras por encima del {promedio:.2f}% de los usuarios de esta aplicación.")
+					stdscr.addstr(f"\n\nTe encuentras por encima del {percentage:.2f}% de los usuarios de esta aplicación.")
 
 				key = stdscr.getkey()
 
