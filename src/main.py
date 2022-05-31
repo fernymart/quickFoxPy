@@ -13,7 +13,7 @@ game_db = GameDB()
 
 # errors = 0
 def save_results(wpm):
-	if(wpm > 0):
+	if(wpm is not None and wpm > 0):
 		with open("../files/results.txt", "a") as file:
 			file.write(f"{wpm}\n")
 
@@ -295,8 +295,67 @@ def load_text(modo):
 		with open("text.txt", "r") as f:
 			lines = f.readlines()
 			return random.choice(lines).strip()
+	elif modo == "3":
+		gen = Generator.Generator()
+		wordlist = gen.generateWords(20)
+		words = ' '.join(x for x in wordlist)
+		return words
 	
 	return 0
+
+def timed_test(stdscr):
+	target_text = load_text("3")
+	current_text = []
+	wpm = 0
+	start_time = time.time()
+	curr_time = start_time
+	# countdown_time = user_data.get_time_limit()
+	countdown_time = 15
+	stdscr.nodelay(True)
+
+	while True:
+		if(time.time()-curr_time > 0.9):
+			countdown_time -= 1
+			curr_time = time.time()
+		time_elapsed = max(time.time() - start_time, 1)
+		wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
+
+		stdscr.clear()
+		display_text(stdscr, target_text, current_text, wpm)
+		stdscr.addstr(5, 0, f"Remaining time: {countdown_time} seconds\n");
+		stdscr.move(0, 0)
+		stdscr.refresh()
+
+		if "".join(current_text) == target_text:
+			target_text = load_text("3")
+			current_text = []
+			# stdscr.nodelay(False)
+			# return wpm
+			# break
+
+		if countdown_time <= 0:
+			
+			stdscr.clear()
+			stdscr.addstr("Se acabó el tiempo!\n")
+			stdscr.nodelay(False)
+			stdscr.getkey()
+			
+			return wpm
+
+		try:
+			key = stdscr.getkey()
+		except:
+			continue
+
+		if ord(key) == 27:
+			stdscr.nodelay(False)
+			break
+
+		if key in ("KEY_BACKSPACE", '\b', "\x7f"):
+			if len(current_text) > 0:
+				current_text.pop()
+		elif len(current_text) < len(target_text):
+			current_text.append(key)
 
 def wpm_test(stdscr, modo):
 	target_text = load_text(modo)
@@ -374,8 +433,15 @@ def main(stdscr):
 			
 		if modo == "3":
 			stdscr.clear()
-			stdscr.addstr("MODO: por límite de tiempo")
-			stdscr.addstr("\nPress any key to continue...")
+			total_wpm=timed_test(stdscr)
+			stdscr.clear()
+			save_results(total_wpm)
+			# stdscr.nodelay(True)
+			# time.sleep(1)
+			# stdscr.clear()
+			stdscr.addstr(1,0,f"Your speed was: {total_wpm} wpm")
+			# stdscr.addstr(2,0,f"You had {errors} errors")
+			stdscr.addstr(3, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 
 		if modo == "4":
