@@ -26,40 +26,56 @@ def start_screen(stdscr):
 
 def menu(stdscr):
 	stdscr.clear()
-	stdscr.addstr("MENÚ\n")
-	stdscr.addstr("Escoge una modalidad\n")
-	stdscr.addstr("1. Por cantidad de palabras\n")
-	stdscr.addstr("2. Escribe una frase aleatoria\n")
-	stdscr.addstr("3. Por límite de tiempo\n")
-	stdscr.addstr("4. Escribe un libro\n")
-	stdscr.addstr("5. Configuración\n")
-	stdscr.addstr("6. Estadísticas\n")
-	stdscr.addstr("7. Salir\n")
+	#stdscr.addstr("MENÚ\n")
+	stdscr.addstr("MAIN MENU\n")
+	#stdscr.addstr("Escoge una modalidad\n")
+	stdscr.addstr("Choose practice mode\n")
+	#stdscr.addstr("1. Por cantidad de palabras\n")
+	stdscr.addstr("1. Words pool\n")
+	#stdscr.addstr("2. Escribe una frase aleatoria\n")
+	stdscr.addstr("2. Random phrase\n")
+	#stdscr.addstr("3. Por límite de tiempo\n")
+	stdscr.addstr("3. Race against time\n")
+	#stdscr.addstr("4. Escribe un libro\n")
+	stdscr.addstr("4. Write a book\n")
+	#stdscr.addstr("5. Configuración\n")
+	stdscr.addstr("5. Settings\n")
+	#stdscr.addstr("6. Estadísticas\n")
+	stdscr.addstr("6. Statistics\n")
+	#stdscr.addstr("7. Salir\n")
+	stdscr.addstr("7. Exit\n")
 
 	key = stdscr.getkey()
 	return key
 
 def config_menu(stdscr):
 	stdscr.clear()
-	stdscr.addstr("CONFIGURACION\n")
-	stdscr.addstr("1. Cambiar límite de palabras\n")
-	stdscr.addstr("2. Cambiar límite de tiempo\n")
-	stdscr.addstr("3. Cambiar nombre de usuario\n")
-	stdscr.addstr("4. Regresar\n")
+	#stdscr.addstr("CONFIGURACION\n")
+	stdscr.addstr("Settings\n")
+	#stdscr.addstr("1. Cambiar límite de palabras\n")
+	stdscr.addstr("1. Change word limit\n")
+	#stdscr.addstr("2. Cambiar límite de tiempo\n")
+	stdscr.addstr("2. Change time limit\n")
+	#stdscr.addstr("3. Cambiar nombre de usuario\n")
+	stdscr.addstr("3. Change username\n")
+	#stdscr.addstr("4. Regresar\n")
+	stdscr.addstr("4. Go Back\n")
 
 	key = stdscr.getkey()
 	return key
 
 def book_menu(stdscr):
 	stdscr.clear()
-	stdscr.addstr("LIBROS\n")
+	#stdscr.addstr("LIBROS\n")
+	stdscr.addstr("Books:\n")
 
 	for i in range(0, len(books)):
 		text = str(i+1) + ". " + books[i]["title"] + " ({:.4f})\n".format(books[i]["written"] / float(books[i]["total_words"]))
 		stdscr.addstr(text)
 
 	back_opt = len(books) + 1
-	text = str(back_opt) + ". Regresar\n"
+	#text = str(back_opt) + ". Regresar\n"
+	text = str(back_opt) + ". Go back\n"
 	stdscr.addstr(text)
 
 	key = stdscr.getkey()
@@ -165,7 +181,8 @@ def get_input(stdscr, limit):
 			text += key
 			count += 1
 
-	stdscr.addstr("\n\nPresiona cualquier tecla para guardar o ESC para cancelar...")
+	#stdscr.addstr("\n\nPresiona cualquier tecla para guardar o ESC para cancelar...")
+	stdscr.addstr("\n\nPress any key to save settings or ESC to cancel...")
 	key = stdscr.getkey()
 
 	if ord(key) == 27:
@@ -179,37 +196,44 @@ def configuration(stdscr):
 	while key != "4":
 		if key == "1":
 			stdscr.clear()
-			stdscr.addstr("Límite actual: ")
+			#stdscr.addstr("Límite actual: ")
+			stdscr.addstr("Current limit: ")
 			stdscr.addstr(str(user_data.get_word_limit()))
-			stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			#stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			stdscr.addstr("\nSet new limit (max. 3 digits): ")
 			s = get_input(stdscr, 3)
 
 			try:
 				if s != "-1":
 					user_data.update_word_limit(int(s))
 			except:
-				stdscr.addstr("\nError. Debes ingresar un número")
+				#stdscr.addstr("\nError. Debes ingresar un número")
+				stdscr.addstr("\nError. The value must be numeric")
 				stdscr.getkey()
 
 		if key == "2":
 			stdscr.clear()
-			stdscr.addstr("Límite actual: ")
+			#stdscr.addstr("Límite actual: ")
+			stdscr.addstr("Current limit: ")
 			stdscr.addstr(str(user_data.get_time_limit()))
-			stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			#stdscr.addstr("\nIngresa el nuevo límite (max. 3 digitos): ")
+			stdscr.addstr("\nSet new limit (max. 3 digits): ")
 			s = get_input(stdscr, 3)
 
 			try:
 				if s != "-1":
 					user_data.update_time_limit(int(s))
 			except:
-					stdscr.addstr("\nError. Debes ingresar un número")
+					#stdscr.addstr("\nError. Debes ingresar un número")
+					stdscr.addstr("\nError. The value must be numeric")
 					stdscr.getkey()
 
 		if key == "3":
 			stdscr.clear()
 			id, user = user_data.get_user()
 			if id is None:
-				stdscr.addstr("Crea tu nombre de usuario (max. 10 caracteres): ")
+				#stdscr.addstr("Crea tu nombre de usuario (max. 10 caracteres): ")
+				stdscr.addstr("Create username (max. 10 characters): ")
 
 				while id is None:
 					newuser = get_input(stdscr, 10)
@@ -220,24 +244,31 @@ def configuration(stdscr):
 					stdscr.clear()
 
 					if newuser == "": 
-						stdscr.addstr("Error. Ingresa otro nombre")
-						stdscr.addstr("\nNombre: ")
+						#stdscr.addstr("Error. Ingresa otro nombre")
+						stdscr.addstr("Error. Invalid username")
+						#stdscr.addstr("\nNombre: ")
+						stdscr.addstr("\nUsername: ")
 						continue
 
 					id = game_db.add_username(newuser)
 
 					if id is None:
-						stdscr.addstr("Error. Ingresa otro nombre")
-						stdscr.addstr("\nNombre: ")
+						#stdscr.addstr("Error. Ingresa otro nombre")
+						stdscr.addstr("Error. Invalid username")
+						#stdscr.addstr("\nNombre: ")
+						stdscr.addstr("\nUsername: ")
 					else:
 						user_data.save_user(id, newuser)
 
-				stdscr.addstr("\nUsuario registrado correctamente.")
+				#stdscr.addstr("\nUsuario registrado correctamente.")
+				stdscr.addstr("\nUser created successfully.")
 				stdscr.getkey()
 
 			else:
-				stdscr.addstr("Tu nombre de usuario actual es " + user)
-				stdscr.addstr("\n\nIngresa tu nuevo nombre (max. 10 caracteres): ")
+				#stdscr.addstr("Tu nombre de usuario actual es " + user)
+				stdscr.addstr("Your current username is " + user)
+				#stdscr.addstr("\n\nIngresa tu nuevo nombre (max. 10 caracteres): ")
+				stdscr.addstr("\n\nEnter your new username (max. 10 characters): ")
 				newuser = get_input(stdscr, 10)
 
 				if newuser != "-1":
@@ -246,10 +277,13 @@ def configuration(stdscr):
 
 					while not updated:
 						stdscr.clear()
-						stdscr.addstr("Error. Ingresa otro nombre")
-						stdscr.addstr("\nTu nombre de usuario actual es ")
+						#stdscr.addstr("Error. Ingresa otro nombre")
+						stdscr.addstr("Error. Invalid username")
+						#stdscr.addstr("\nTu nombre de usuario actual es ")
+						stdscr.addstr("Your current username is " + user)
 						stdscr.addstr(user)
-						stdscr.addstr("\n\nNuevo nombre: ")
+						#stdscr.addstr("\n\nNuevo nombre: ")
+						stdscr.addstr("\n\nNew username: ")
 						newuser = get_input(stdscr, 10)
 
 						newuser = newuser.strip()
@@ -262,7 +296,8 @@ def configuration(stdscr):
 
 					user_data.save_user(id, newuser)
 
-					stdscr.addstr("\nNombre de usuario cambiado correctamente.")
+					#stdscr.addstr("\nNombre de usuario cambiado correctamente.")
+					stdscr.addstr("\nUsername changed successfully.")
 					stdscr.getkey()
 
 		key = config_menu(stdscr)
@@ -336,7 +371,8 @@ def timed_test(stdscr):
 		if countdown_time <= 0:
 			
 			stdscr.clear()
-			stdscr.addstr("Se acabó el tiempo!\n")
+			#stdscr.addstr("Se acabó el tiempo!\n")
+			stdscr.addstr("You ran out of time! Keep up practicing\n")
 			stdscr.nodelay(False)
 			stdscr.getkey()
 			
@@ -400,7 +436,8 @@ def display_estadisticas(stdscr):
 		for resultado in resultados:
 			suma+=float(resultado)
 		promedio = suma / len(resultados)
-	stdscr.addstr(2, 0, f"Promedio: {promedio} wpm")
+	#stdscr.addstr(2, 0, f"Promedio: {promedio} wpm")
+	stdscr.addstr(2, 0, f"Average: {promedio} wpm")
 	return promedio
 
 def main(stdscr):
@@ -464,19 +501,23 @@ def main(stdscr):
 			promedio = display_estadisticas(stdscr)
 			# stdscr.addstr(1, 0, "Estadisticas historicas")
 
-			stdscr.addstr("\n\nPresiona 1 para publicar y comparar tus estadísticas con otros usuarios")
-			stdscr.addstr("\no cualquier otra tecla para regresar...")
+			#stdscr.addstr("\n\nPresiona 1 para publicar y comparar tus estadísticas con otros usuarios")
+			stdscr.addstr("\n\nPress 1 to share your statistics with other users.")
+			#stdscr.addstr("\no cualquier otra tecla para regresar...")
+			stdscr.addstr("\nPress any other key to return to main menu...")
 			key = stdscr.getkey()
 
 			if key == "1":
 				id, user = user_data.get_user()
 				if id is None:
-					stdscr.addstr("\n\nNo tienes un usuario registrado. Registra uno en la configuración.")
+					#stdscr.addstr("\n\nNo tienes un usuario registrado. Registra uno en la configuración.")
+					stdscr.addstr("\n\nIt seems like you do not have a registered user. Please, register one in the settings.")
 				else:
 					game_db.post_stats(id, promedio)
 					percentage = game_db.get_stats(promedio)
 
-					stdscr.addstr(f"\n\nTe encuentras por encima del {percentage:.2f}% de los usuarios de esta aplicación.")
+					#stdscr.addstr(f"\n\nTe encuentras por encima del {percentage:.2f}% de los usuarios de esta aplicación.")
+					stdscr.addstr(f"\n\nYou are above the {percentage:.2f}% of the users of this app.")
 
 				key = stdscr.getkey()
 
