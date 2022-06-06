@@ -29,7 +29,7 @@ def menu(stdscr):
 	#stdscr.addstr("MENÚ\n")
 	stdscr.addstr("MAIN MENU\n")
 	#stdscr.addstr("Escoge una modalidad\n")
-	stdscr.addstr("Chose practice mode\n")
+	stdscr.addstr("Choose practice mode\n")
 	#stdscr.addstr("1. Por cantidad de palabras\n")
 	stdscr.addstr("1. Words pool\n")
 	#stdscr.addstr("2. Escribe una frase aleatoria\n")
