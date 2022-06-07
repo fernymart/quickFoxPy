@@ -69,7 +69,9 @@ def config_menu(stdscr):
 	#stdscr.addstr("3. Cambiar nombre de usuario\n")
 	stdscr.addstr("3. Change username\n")
 	#stdscr.addstr("4. Regresar\n")
-	stdscr.addstr("4. Go Back\n")
+	stdscr.addstr("4. Change wrong character color\n")
+	stdscr.addstr("5. Change correct character color\n")
+	stdscr.addstr("6. Go Back\n")
 
 	key = stdscr.getkey()
 	return key
@@ -212,10 +214,40 @@ def get_input(stdscr, limit):
 
 	return text
 
+def color_options(stdscr):
+	colors = ["red", "green", "yellow", "blue", "magenta", "cyan"]
+	for i in range(0, len(colors)):
+		stdscr.addstr(f"{i + 1}. {colors[i]}\n")
+
+	stdscr.addstr("7. Go back\n")
+	key = stdscr.getkey()
+
+	if key == "7":
+		return -1
+
+	try:
+		return int(key) - 1
+	except:
+		return -1
+
+def change_color(type, color):
+	if color == 0:
+		curses.init_pair(type, curses.COLOR_RED, curses.COLOR_BLACK)
+	elif color == 1:
+		curses.init_pair(type, curses.COLOR_GREEN, curses.COLOR_BLACK)
+	elif color == 2:
+		curses.init_pair(type, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+	elif color == 3:
+		curses.init_pair(type, curses.COLOR_BLUE, curses.COLOR_BLACK)
+	elif color == 4:
+		curses.init_pair(type, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+	elif color == 5:
+		curses.init_pair(type, curses.COLOR_CYAN, curses.COLOR_BLACK)
+
 def configuration(stdscr):
 	key = config_menu(stdscr)
 
-	while key != "4":
+	while key != "6":
 		if key == "1":
 			stdscr.clear()
 			#stdscr.addstr("Límite actual: ")
@@ -321,6 +353,15 @@ def configuration(stdscr):
 					#stdscr.addstr("\nNombre de usuario cambiado correctamente.")
 					stdscr.addstr("\nUsername changed successfully.")
 					stdscr.getkey()
+
+		if key == "4": # cambiar color errores
+			stdscr.clear()
+			new_color = color_options(stdscr)
+			change_color(2, new_color)
+		if key == "5": # cambiar color correctos
+			stdscr.clear()
+			new_color = color_options(stdscr)
+			change_color(1, new_color)
 
 		key = config_menu(stdscr)
 
