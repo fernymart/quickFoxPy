@@ -472,7 +472,7 @@ def display_estadisticas(stdscr):
 	return promedio
 	
 def twitter_share(wpm, errors, char_count):
-	url = f"http://twitter.com/share?text=Today my speed was {wpm} wpm {emojize(':muscle::grinning_face::computer:', language='alias')} %0AI made {errors} mistakes in {char_count} characters"
+	url = f"http://twitter.com/share?text=Today my speed was {wpm} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0AI made {errors} mistakes in {char_count} characters%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
 	webbrowser.open(url, new=0, autoraise=True)
 
 def main(stdscr):
