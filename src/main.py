@@ -3,6 +3,8 @@ from curses import newwin, wrapper
 from re import S
 import time
 import random
+import webbrowser
+from emoji import emojize
 import Generator
 from UserData import UserData
 from connection import GameDB
@@ -468,6 +470,10 @@ def display_estadisticas(stdscr):
 	#stdscr.addstr(2, 0, f"Promedio: {promedio} wpm")
 	stdscr.addstr(2, 0, f"Average: {promedio} wpm")
 	return promedio
+	
+def twitter_share(wpm, errors, char_count):
+	url = f"http://twitter.com/share?text=Today my speed was {wpm} wpm {emojize(':muscle::grinning_face::computer:', language='alias')} %0AI made {errors} mistakes in {char_count} characters"
+	webbrowser.open(url, new=0, autoraise=True)
 
 def main(stdscr):
 	global errors
@@ -487,8 +493,10 @@ def main(stdscr):
 			save_results(total_wpm)
 			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
 			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
-			stdscr.addstr(4, 0, "You completed the text! Press any key to continue...")
-			stdscr.getkey()
+			stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
+			key = stdscr.getkey()
+			if key == "1":
+				twitter_share(total_wpm, errors, char_count)
 		
 		if modo == "2": # Frase aleatoria
 			total_wpm = wpm_test(stdscr, modo)
@@ -496,8 +504,10 @@ def main(stdscr):
 			save_results(total_wpm)
 			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
 			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
-			stdscr.addstr(4, 0, "You completed the text! Press any key to continue...")
-			stdscr.getkey()
+			stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
+			key = stdscr.getkey()
+			if key == "1":
+				twitter_share(total_wpm, errors, char_count)
 			
 		if modo == "3": # Contrarreloj
 			stdscr.clear()
@@ -509,8 +519,10 @@ def main(stdscr):
 			# stdscr.clear()
 			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
 			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
-			stdscr.addstr(4, 0, "You completed the text! Press any key to continue...")
-			stdscr.getkey()
+			stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
+			key = stdscr.getkey()
+			if key == "1":
+				twitter_share(total_wpm, errors, char_count)
 
 		if modo == "4": # Escribir un libro
 			book = book_menu(stdscr)
@@ -521,8 +533,10 @@ def main(stdscr):
 				save_results(total_wpm)
 				stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
 				stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
-				stdscr.addstr(4, 0, "Press any key to continue...")
-				stdscr.getkey()
+				stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
+				key = stdscr.getkey()
+				if key == "1":
+					twitter_share(total_wpm, errors, char_count)
 				stdscr.clear()
 
 		if modo == "5": # Configuracion
