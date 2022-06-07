@@ -662,6 +662,7 @@ def main(stdscr):
 				if id is None:
 					#stdscr.addstr("\n\nNo tienes un usuario registrado. Registra uno en la configuración.")
 					stdscr.addstr("\n\nIt seems like you do not have a registered user. Please, register one in the settings.")
+					stdscr.getkey()
 				else:
 					game_db.post_stats(id, promedio, promedio_chars)
 					percentage, percentage_chars = game_db.get_stats(promedio, promedio_chars)
@@ -670,6 +671,7 @@ def main(stdscr):
 					stdscr.addstr(f"\n\nIn terms of speed, you are above the {percentage:.2f}% of the users of this app.")
 					stdscr.addstr(f"\nIn terms of number of mistakes made, you are above the {percentage_chars:.2f}% of the users of this app.")
 					stdscr.addstr(f"\n\nPress 1 to share on Twitter.")
+					stdscr.addstr("\nPress any other key to return to main menu...")
 
 					key = stdscr.getkey()
 					if key == "1":
