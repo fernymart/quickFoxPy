@@ -151,7 +151,7 @@ def write_book(stdscr, book):
 
 		if "".join(current_text) == target_text:
 			current_text = []
-			target_text = " ".join(lines[start_line:start_line + show_lines]).replace("\n", "")
+			target_text = " ".join(lines[start_line:start_line + show_lines]).replace("\n", "").strip() + " "
 			start_line += show_lines
 			stdscr.clear()
 			continue
@@ -327,7 +327,7 @@ def display_text(stdscr, target, current, text_changed, wpm=0):
 	for i, char in enumerate(current):
 		correct_char = target[i]
 		color = curses.color_pair(1)
-		if char != correct_char:
+		if char != correct_char and not (ord(correct_char) == 8217 and ord(char) == 39):
 			color = curses.color_pair(2)
 		try:
 			stdscr.addstr(char, color)
@@ -363,8 +363,7 @@ def timed_test(stdscr):
 	text_changed = False
 	start_time = time.time()
 	curr_time = start_time
-	# countdown_time = user_data.get_time_limit()
-	countdown_time = 15
+	countdown_time = user_data.get_time_limit()
 	stdscr.nodelay(True)
 	char_count = 0
 
