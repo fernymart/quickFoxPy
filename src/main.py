@@ -14,8 +14,13 @@ books = user_data.get_books()
 game_db = GameDB()
 errors = 0
 char_count = 0
+characters = user_data.get_characters() # caracteres en los que se equivoca el usuario
 
 def save_results(wpm):
+	user_data.update_characters(characters)
+	with open("../files/wrong_chars.txt", "a") as file: # guarda la cantidad de caracteres en los equivocó por cada 10 escritos
+			file.write(f"{10 * errors / char_count}\n")
+
 	if(wpm is not None and wpm > 0):
 		with open("../files/results.txt", "a") as file:
 			file.write(f"{wpm}\n")
@@ -337,6 +342,7 @@ def display_text(stdscr, target, current, text_changed, wpm=0):
 			pass
 
 	if text_changed and len(current) > 0 and target[len(current) - 1] != current[-1]: # solo revisa si se equivocó en el último caracter que se escribió
+		characters[target[len(current) - 1]] = characters.get(target[len(current) - 1], 0) + 1
 		errors += 1
 
 def load_text(modo):
@@ -480,15 +486,26 @@ def wpm_test(stdscr, modo):
 
 def display_estadisticas(stdscr):
 	promedio = 0
+	promedio_chars = 0
 	suma = 0
 	with open("../files/results.txt", "r") as file:
 		resultados = file.readlines()
 		for resultado in resultados:
 			suma+=float(resultado)
 		promedio = suma / len(resultados)
+
+	suma = 0
+	with open("../files/wrong_chars.txt", "r") as file:
+		resultados = file.readlines()
+		for resultado in resultados:
+			suma+=float(resultado)
+		promedio_chars = suma / len(resultados)
+
 	#stdscr.addstr(2, 0, f"Promedio: {promedio} wpm")
-	stdscr.addstr(2, 0, f"Average: {promedio} wpm")
-	return promedio
+	stdscr.addstr(3, 0, f"Average: {promedio:.2f} wpm")
+	stdscr.addstr(4, 0,f"The character you have gotten wrong more times is {user_data.get_wrong_char()}")
+	stdscr.addstr(5, 0, f"On average you make {promedio_chars:.2f} mistakes every 10 characters.")
+	return promedio, promedio_chars
 	
 def twitter_share(wpm, errors = None, char_count = None):
 	if char_count is not None:
@@ -581,11 +598,11 @@ def main(stdscr):
 		if modo == "7": # Estadísticas
 			stdscr.clear()
 			stdscr.addstr(1, 0, "Statistics")
-			promedio = display_estadisticas(stdscr)
+			promedio, promedio_chars = display_estadisticas(stdscr)
 			# stdscr.addstr(1, 0, "Estadisticas historicas")
 
 			#stdscr.addstr("\n\nPresiona 1 para publicar y comparar tus estadísticas con otros usuarios")
-			stdscr.addstr("\nPress 1 to share your statistics on Twitter.")
+			stdscr.addstr("\n\nPress 1 to share your statistics on Twitter.")
 			stdscr.addstr("\nPress 2 to share your statistics with other users of this app.")
 			#stdscr.addstr("\no cualquier otra tecla para regresar...")
 			stdscr.addstr("\n\nPress any other key to return to main menu...")
@@ -597,11 +614,12 @@ def main(stdscr):
 					#stdscr.addstr("\n\nNo tienes un usuario registrado. Registra uno en la configuración.")
 					stdscr.addstr("\n\nIt seems like you do not have a registered user. Please, register one in the settings.")
 				else:
-					game_db.post_stats(id, promedio)
-					percentage = game_db.get_stats(promedio)
+					game_db.post_stats(id, promedio, promedio_chars)
+					percentage, percentage_chars = game_db.get_stats(promedio, promedio_chars)
 
 					#stdscr.addstr(f"\n\nTe encuentras por encima del {percentage:.2f}% de los usuarios de esta aplicación.")
-					stdscr.addstr(f"\n\nYou are above the {percentage:.2f}% of the users of this app.")
+					stdscr.addstr(f"\n\nIn terms of speed, you are above the {percentage:.2f}% of the users of this app.")
+					stdscr.addstr(f"\nIn terms of number of mistakes made, you are above the {percentage_chars:.2f}% of the users of this app.")
 					stdscr.addstr(f"\n\nPress 1 to share on Twitter.")
 
 					key = stdscr.getkey()

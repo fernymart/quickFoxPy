@@ -37,6 +37,21 @@ class UserData():
         self.data["books"][book]["written"] += value
         self.update_file()
 
+    def get_characters(self):
+        if "wrong_chars" in self.data:
+            return self.data["wrong_chars"]
+        else:
+            return {}
+
+    def update_characters(self, chars):
+        self.data["wrong_chars"] = chars
+        self.update_file()
+
+    def get_wrong_char(self):
+        if "wrong_chars" in self.data:
+            return max(self.data["wrong_chars"], key=self.data["wrong_chars"].get)
+        return " "
+
     def update_file(self):
         jsonFile = open(self.file_name, "w+")
         jsonFile.write(json.dumps(self.data))
