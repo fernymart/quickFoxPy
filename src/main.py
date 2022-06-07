@@ -41,14 +41,16 @@ def menu(stdscr):
 	stdscr.addstr("3. Race against time\n")
 	#stdscr.addstr("4. Escribe un libro\n")
 	stdscr.addstr("4. Write a book\n")
+	stdscr.addstr("5. Numpad mode\n")
 	#stdscr.addstr("5. Configuración\n")
-	stdscr.addstr("5. Settings\n")
+	stdscr.addstr("6. Settings\n")
 	#stdscr.addstr("6. Estadísticas\n")
-	stdscr.addstr("6. Statistics\n")
+	stdscr.addstr("7. Statistics\n")
 	#stdscr.addstr("7. Salir\n")
-	stdscr.addstr("7. Exit\n")
+	stdscr.addstr("8. Exit\n")
 
 	key = stdscr.getkey()
+
 	return key
 
 def config_menu(stdscr):
@@ -352,7 +354,11 @@ def load_text(modo):
 		wordlist = gen.generateWords(20)
 		words = ' '.join(x for x in wordlist)
 		return words
-	
+	elif modo == "5":
+		gen = Generator.Generator()
+		words = gen.generateOperations(user_data.get_word_limit())
+		return words
+
 	return 0
 
 def timed_test(stdscr):
@@ -428,6 +434,13 @@ def wpm_test(stdscr, modo):
 	stdscr.nodelay(True)
 	text_changed = False
 
+	operadores = {
+		"PADSLASH" : "/",
+		"PADSTAR" : "*",
+		"PADMINUS" : "-",
+		"PADPLUS" : "+"
+	}
+
 	while True:
 		time_elapsed = max(time.time() - start_time, 1)
 		wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
@@ -446,6 +459,13 @@ def wpm_test(stdscr, modo):
 			key = stdscr.getkey()
 		except:
 			continue
+
+		if modo == "5":
+			if key in operadores:
+				text_changed = True
+				current_text.append(operadores[key])
+				continue
+			
 
 		if ord(key) == 27: # ESC
 			stdscr.nodelay(False)
@@ -489,7 +509,7 @@ def main(stdscr):
 	modo = menu(stdscr)
 	total_wpm = 0
 
-	while modo != "7":
+	while modo != "8":
 		errors = 0
 		if modo == "1": # Cantidad de palabras
 			total_wpm = wpm_test(stdscr, modo)
@@ -543,11 +563,22 @@ def main(stdscr):
 					twitter_share(total_wpm, errors, char_count)
 				stdscr.clear()
 
-		if modo == "5": # Configuracion
+		if modo == "5": # Numpad
+			total_wpm = wpm_test(stdscr, modo)
+			stdscr.clear()
+			save_results(total_wpm)
+			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
+			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
+			stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
+			key = stdscr.getkey()
+			if key == "1":
+				twitter_share(total_wpm, errors, char_count)
+
+		if modo == "6": # Configuracion
 			configuration(stdscr)
 			stdscr.clear()
 		
-		if modo == "6": # Estadísticas
+		if modo == "7": # Estadísticas
 			stdscr.clear()
 			stdscr.addstr(1, 0, "Statistics")
 			promedio = display_estadisticas(stdscr)
