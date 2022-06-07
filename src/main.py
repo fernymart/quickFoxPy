@@ -6,7 +6,9 @@ import random
 import webbrowser
 from emoji import emojize
 import Generator
+from NumpadMode import NumpadMode
 from PhraseMode import PhraseMode
+from TimeraceMode import TimeraceMode
 from UserData import UserData
 from WordMode import WordsMode
 from connection import GameDB
@@ -366,14 +368,11 @@ def load_text(modo):
 		concreteMode = PhraseMode()
 		return concreteMode.templateMode()
 	elif modo == "3":
-		gen = Generator.Generator()
-		wordlist = gen.generateWords(20)
-		words = ' '.join(x for x in wordlist)
-		return words
+		concreteMode = TimeraceMode()
+		return concreteMode.templateMode()
 	elif modo == "5":
-		gen = Generator.Generator()
-		words = gen.generateOperations(user_data.get_word_limit())
-		return words
+		concreteMode = NumpadMode()
+		return concreteMode.templateMode()
 
 	return 0
 
