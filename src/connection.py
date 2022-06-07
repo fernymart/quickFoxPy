@@ -34,20 +34,21 @@ class GameDB:
             users.update_one(find, {"$set": newdata })
             return True
 
-    def post_stats(self, userid, stat):
+    def post_stats(self, userid, stat, chars_stat):
         with pymongo.MongoClient(self.uri) as client:
             db = client['TypingTest']
             stats = db['stats']
             find = { 'user' : ObjectId(userid) }
-            data = {'speed': stat }
+            data = {'speed': stat, 'wrong_chars' : chars_stat }
             stats.update_one(find, {"$set": data }, upsert=True)
 
-    def get_stats(self, stat):
+    def get_stats(self, stat, chars_stat):
         with pymongo.MongoClient(self.uri) as client:
             db = client['TypingTest']
             stats = db['stats']
             total = stats.count_documents({})
-            lower = stats.count_documents({ 'speed' : { '$lt' : stat } })
+            lower = stats.count_documents({ 'speed' : { '$lt' : stat } }) # quienes son mas lentos
+            greater_chars = stats.count_documents({ 'wrong_chars' : { '$gt' : chars_stat } }) # quienes tienen mas errores
 
             # está por encima del x%
-            return lower / total * 100
+            return lower / total * 100, greater_chars / total * 100
