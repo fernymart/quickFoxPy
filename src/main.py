@@ -14,8 +14,10 @@ books = user_data.get_books()
 game_db = GameDB()
 errors = 0
 char_count = 0
+characters = user_data.get_characters() # caracteres en los que se equivoca el usuario
 
 def save_results(wpm):
+	user_data.update_characters(characters)
 	if(wpm is not None and wpm > 0):
 		with open("../files/results.txt", "a") as file:
 			file.write(f"{wpm}\n")
@@ -337,6 +339,7 @@ def display_text(stdscr, target, current, text_changed, wpm=0):
 			pass
 
 	if text_changed and len(current) > 0 and target[len(current) - 1] != current[-1]: # solo revisa si se equivocó en el último caracter que se escribió
+		characters[target[len(current) - 1]] = characters.get(target[len(current) - 1], 0) + 1
 		errors += 1
 
 def load_text(modo):
@@ -487,7 +490,8 @@ def display_estadisticas(stdscr):
 			suma+=float(resultado)
 		promedio = suma / len(resultados)
 	#stdscr.addstr(2, 0, f"Promedio: {promedio} wpm")
-	stdscr.addstr(2, 0, f"Average: {promedio} wpm")
+	stdscr.addstr(3, 0, f"Average: {promedio} wpm")
+	stdscr.addstr(4, 0,f"The character you have gotten wrong more times is {user_data.get_wrong_char()}")
 	return promedio
 	
 def twitter_share(wpm, errors = None, char_count = None):
@@ -585,7 +589,7 @@ def main(stdscr):
 			# stdscr.addstr(1, 0, "Estadisticas historicas")
 
 			#stdscr.addstr("\n\nPresiona 1 para publicar y comparar tus estadísticas con otros usuarios")
-			stdscr.addstr("\nPress 1 to share your statistics on Twitter.")
+			stdscr.addstr("\n\nPress 1 to share your statistics on Twitter.")
 			stdscr.addstr("\nPress 2 to share your statistics with other users of this app.")
 			#stdscr.addstr("\no cualquier otra tecla para regresar...")
 			stdscr.addstr("\n\nPress any other key to return to main menu...")
