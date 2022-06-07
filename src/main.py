@@ -71,7 +71,8 @@ def config_menu(stdscr):
 	#stdscr.addstr("4. Regresar\n")
 	stdscr.addstr("4. Change wrong character color\n")
 	stdscr.addstr("5. Change correct character color\n")
-	stdscr.addstr("6. Go Back\n")
+	stdscr.addstr("6. Send feedback\n")
+	stdscr.addstr("7. Go Back\n")
 
 	key = stdscr.getkey()
 	return key
@@ -247,7 +248,7 @@ def set_color(type, color):
 def configuration(stdscr):
 	key = config_menu(stdscr)
 
-	while key != "6":
+	while key != "7":
 		if key == "1":
 			stdscr.clear()
 			#stdscr.addstr("Límite actual: ")
@@ -359,12 +360,16 @@ def configuration(stdscr):
 			new_color = color_options(stdscr)
 			set_color(2, new_color)
 			user_data.change_color_opt(2, new_color)
+
 		if key == "5": # cambiar color correctos
 			stdscr.clear()
 			new_color = color_options(stdscr)
 			set_color(1, new_color)
 			user_data.change_color_opt(1, new_color)
 
+		if key == "6": # Feedback
+			url = "mailto:?to=A01197148@tec.mx&subject=Feedback speed test app"
+			webbrowser.open(url, new=0, autoraise=True)
 		key = config_menu(stdscr)
 
 def display_text(stdscr, target, current, text_changed, wpm=0):
