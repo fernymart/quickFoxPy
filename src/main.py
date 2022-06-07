@@ -471,8 +471,13 @@ def display_estadisticas(stdscr):
 	stdscr.addstr(2, 0, f"Average: {promedio} wpm")
 	return promedio
 	
-def twitter_share(wpm, errors, char_count):
-	url = f"http://twitter.com/share?text=Today my speed was {wpm} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0AI made {errors} mistakes in {char_count} characters%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
+def twitter_share(wpm, errors = None, char_count = None):
+	if char_count is not None:
+		url = f"http://twitter.com/share?text=Today my speed was {wpm} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0AI made {errors} mistakes in {char_count} characters%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
+	elif errors is not None:
+		url = f"http://twitter.com/share?text=My average speed is {wpm:.2f} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0AI am faster than {errors:.2f}%25 of players.{emojize(':zap:', language='alias')}%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
+	else:
+		url = f"http://twitter.com/share?text=My average speed is {wpm:.2f} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
 	webbrowser.open(url, new=0, autoraise=True)
 
 def main(stdscr):
@@ -550,12 +555,13 @@ def main(stdscr):
 			# stdscr.addstr(1, 0, "Estadisticas historicas")
 
 			#stdscr.addstr("\n\nPresiona 1 para publicar y comparar tus estadísticas con otros usuarios")
-			stdscr.addstr("\n\nPress 1 to share your statistics with other users.")
+			stdscr.addstr("\nPress 1 to share your statistics on Twitter.")
+			stdscr.addstr("\nPress 2 to share your statistics with other users of this app.")
 			#stdscr.addstr("\no cualquier otra tecla para regresar...")
-			stdscr.addstr("\nPress any other key to return to main menu...")
+			stdscr.addstr("\n\nPress any other key to return to main menu...")
 			key = stdscr.getkey()
 
-			if key == "1":
+			if key == "2":
 				id, user = user_data.get_user()
 				if id is None:
 					#stdscr.addstr("\n\nNo tienes un usuario registrado. Registra uno en la configuración.")
@@ -566,8 +572,14 @@ def main(stdscr):
 
 					#stdscr.addstr(f"\n\nTe encuentras por encima del {percentage:.2f}% de los usuarios de esta aplicación.")
 					stdscr.addstr(f"\n\nYou are above the {percentage:.2f}% of the users of this app.")
+					stdscr.addstr(f"\n\nPress 1 to share on Twitter.")
 
-				key = stdscr.getkey()
+					key = stdscr.getkey()
+					if key == "1":
+						twitter_share(promedio, percentage)
+			elif key == "1":
+				twitter_share(promedio)
+
 
 		modo = menu(stdscr)
 	
