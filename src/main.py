@@ -230,7 +230,7 @@ def color_options(stdscr):
 	except:
 		return -1
 
-def change_color(type, color):
+def set_color(type, color):
 	if color == 0:
 		curses.init_pair(type, curses.COLOR_RED, curses.COLOR_BLACK)
 	elif color == 1:
@@ -357,11 +357,13 @@ def configuration(stdscr):
 		if key == "4": # cambiar color errores
 			stdscr.clear()
 			new_color = color_options(stdscr)
-			change_color(2, new_color)
+			set_color(2, new_color)
+			user_data.change_color_opt(2, new_color)
 		if key == "5": # cambiar color correctos
 			stdscr.clear()
 			new_color = color_options(stdscr)
-			change_color(1, new_color)
+			set_color(1, new_color)
+			user_data.change_color_opt(1, new_color)
 
 		key = config_menu(stdscr)
 
@@ -460,7 +462,7 @@ def timed_test(stdscr):
 
 		if ord(key) == 27: # ESC
 			stdscr.nodelay(False)
-			break
+			return wpm
 
 		if key in ("KEY_BACKSPACE", '\b', "\x7f"):
 			if len(current_text) > 0:
@@ -559,8 +561,9 @@ def twitter_share(wpm, errors = None, char_count = None):
 
 def main(stdscr):
 	global errors
-	curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-	curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+	color_correct, color_incorrect = user_data.get_colors()
+	set_color(1, color_correct)
+	set_color(2, color_incorrect)
 	curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
 	start_screen(stdscr)

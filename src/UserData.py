@@ -52,6 +52,23 @@ class UserData():
             return max(self.data["wrong_chars"], key=self.data["wrong_chars"].get)
         return " "
 
+    def get_colors(self):
+        if "colors" in self.data:
+            return self.data["colors"]["correct"], self.data["colors"]["incorrect"]
+        else:
+            self.data["colors"] = {}
+            self.data["colors"]["correct"] = 1
+            self.data["colors"]["incorrect"] = 0
+            self.update_file()
+            return 1, 0
+
+    def change_color_opt(self, type, color):
+        if type == 1:
+            self.data["colors"]["correct"] = color
+        elif type == 2:
+            self.data["colors"]["incorrect"] = color
+        self.update_file()
+
     def update_file(self):
         jsonFile = open(self.file_name, "w+")
         jsonFile.write(json.dumps(self.data))
