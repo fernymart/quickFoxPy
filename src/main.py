@@ -10,8 +10,9 @@ from connection import GameDB
 user_data = UserData()
 books = user_data.get_books()
 game_db = GameDB()
+errors = 0
+char_count = 0
 
-# errors = 0
 def save_results(wpm):
 	if(wpm is not None and wpm > 0):
 		with open("../files/results.txt", "a") as file:
@@ -77,15 +78,19 @@ def book_menu(stdscr):
 	#text = str(back_opt) + ". Regresar\n"
 	text = str(back_opt) + ". Go back\n"
 	stdscr.addstr(text)
-
+	stdscr.addstr("\nDuring the practice press ESC to finish.\n")
 	key = stdscr.getkey()
 
 	if key == str(back_opt):
 		return -1
 
-	return int(key) - 1
+	try:
+		return int(key) - 1
+	except:
+		return -1
 
 def skip_lines(lines, skip_words):
+	'''Recorre la lista lines y salta skip_words palabras para llegar hasta donde el usuario se había quedado'''
 	lines_skipped = 0
 	extra_text = ""
 	count = 0
@@ -101,7 +106,7 @@ def skip_lines(lines, skip_words):
 			count += len(words)
 			continue
 
-		elif count + len(words) > skip_words: # queda en medio de una linea
+		elif count + len(words) > skip_words: # queda en medio de una linea, así que comienza a irse por palabras
 			lines_skipped += 1
 			for word in words:
 				count += 1
@@ -109,9 +114,11 @@ def skip_lines(lines, skip_words):
 					extra_text += word + " "
 			break
 
+	# Devuelve el número de líneas completas que se saltó y las palabras que faltan por escribir de la línea donde se quedó el usuario
 	return (lines_skipped, extra_text)
 
 def write_book(stdscr, book):
+	global char_count
 	show_lines = 1
 	file_name = books[int(book)]["file_name"]
 	file = open("books/" + file_name, "r", encoding="utf-8-sig")
@@ -124,18 +131,20 @@ def write_book(stdscr, book):
 	start_line = lines_skipped
 	target_text = extra_text + " ".join(lines[start_line:start_line + show_lines]).replace("\n", "") + " "
 	current_text = []
-
+	text_changed = False
 	start_time = time.time()
 	wpm = 0
 	start_line += show_lines
 	words = 0
+	char_count = 0
 
 	while True:
 		time_elapsed = max(time.time() - start_time, 1)
 		wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
 
 		stdscr.clear()
-		display_text(stdscr, target_text, current_text, wpm)
+		display_text(stdscr, target_text, current_text, text_changed, wpm)
+		text_changed = False
 		stdscr.refresh()
 
 		if "".join(current_text) == target_text:
@@ -150,10 +159,10 @@ def write_book(stdscr, book):
 		except:
 			continue
 
-		if ord(key) == 32:
+		if ord(key) == 32: # espacio
 			words += 1
 
-		if ord(key) == 27:
+		if ord(key) == 27: # ESC
 			stdscr.nodelay(False)
 			break
 
@@ -163,9 +172,13 @@ def write_book(stdscr, book):
 			if len(current_text) > 0:
 				current_text.pop()
 		elif len(current_text) < len(target_text):
+			text_changed = True
+			if len(current_text) > char_count:
+				char_count = len(current_text)
 			current_text.append(key)
 
 	user_data.update_written_words(int(book), words)
+	return wpm
 
 def get_input(stdscr, limit):
 	count = 0
@@ -185,7 +198,7 @@ def get_input(stdscr, limit):
 	stdscr.addstr("\n\nPress any key to save settings or ESC to cancel...")
 	key = stdscr.getkey()
 
-	if ord(key) == 27:
+	if ord(key) == 27: # ESC (cancelar)
 		text = "-1"
 
 	return text
@@ -302,10 +315,10 @@ def configuration(stdscr):
 
 		key = config_menu(stdscr)
 
-def display_text(stdscr, target, current, wpm=0):
+def display_text(stdscr, target, current, text_changed, wpm=0):
 	# text_window = curses.newwin(curses.COLS, 20, 0, 0)
 	# box(text_window)
-	# global errors
+	global errors
 	stdscr.addstr(target)
 	stdscr.addstr(f"\nWPM: {wpm}")
 	stdscr.move(0, 0)
@@ -314,11 +327,13 @@ def display_text(stdscr, target, current, wpm=0):
 		color = curses.color_pair(1)
 		if char != correct_char:
 			color = curses.color_pair(2)
-			# errors+=1
 		try:
 			stdscr.addstr(char, color)
-		except curses.error:
+		except curses.error: 
 			pass
+
+	if text_changed and len(current) > 0 and target[len(current) - 1] != current[-1]: # solo revisa si se equivocó en el último caracter que se escribió
+		errors += 1
 
 def load_text(modo):
 	if modo == "1":
@@ -339,14 +354,17 @@ def load_text(modo):
 	return 0
 
 def timed_test(stdscr):
+	global char_count
 	target_text = load_text("3")
 	current_text = []
 	wpm = 0
+	text_changed = False
 	start_time = time.time()
 	curr_time = start_time
 	# countdown_time = user_data.get_time_limit()
 	countdown_time = 15
 	stdscr.nodelay(True)
+	char_count = 0
 
 	while True:
 		if(time.time()-curr_time > 0.9):
@@ -356,7 +374,8 @@ def timed_test(stdscr):
 		wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
 
 		stdscr.clear()
-		display_text(stdscr, target_text, current_text, wpm)
+		display_text(stdscr, target_text, current_text, text_changed, wpm)
+		text_changed = False
 		stdscr.addstr(5, 0, f"Remaining time: {countdown_time} seconds\n");
 		stdscr.move(0, 0)
 		stdscr.refresh()
@@ -369,13 +388,15 @@ def timed_test(stdscr):
 			# break
 
 		if countdown_time <= 0:
-			
+			char_count = len(current_text)
 			stdscr.clear()
 			#stdscr.addstr("Se acabó el tiempo!\n")
 			stdscr.addstr("You ran out of time! Keep up practicing\n")
+			stdscr.addstr("Press ESC to see results.\n") 
 			stdscr.nodelay(False)
-			stdscr.getkey()
-			
+			key = stdscr.getkey()
+			while ord(key) != 27:
+				key = stdscr.getkey()
 			return wpm
 
 		try:
@@ -383,7 +404,7 @@ def timed_test(stdscr):
 		except:
 			continue
 
-		if ord(key) == 27:
+		if ord(key) == 27: # ESC
 			stdscr.nodelay(False)
 			break
 
@@ -391,21 +412,28 @@ def timed_test(stdscr):
 			if len(current_text) > 0:
 				current_text.pop()
 		elif len(current_text) < len(target_text):
+			text_changed = True
+			if len(current_text) > char_count:
+				char_count = len(current_text)
 			current_text.append(key)
 
 def wpm_test(stdscr, modo):
+	global char_count
 	target_text = load_text(modo)
+	char_count = len(target_text)
 	current_text = []
 	wpm = 0
 	start_time = time.time()
 	stdscr.nodelay(True)
+	text_changed = False
 
 	while True:
 		time_elapsed = max(time.time() - start_time, 1)
 		wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
 
 		stdscr.clear()
-		display_text(stdscr, target_text, current_text, wpm)
+		display_text(stdscr, target_text, current_text, text_changed, wpm)
+		text_changed = False
 		stdscr.refresh()
 
 		if "".join(current_text) == target_text:
@@ -418,7 +446,7 @@ def wpm_test(stdscr, modo):
 		except:
 			continue
 
-		if ord(key) == 27:
+		if ord(key) == 27: # ESC
 			stdscr.nodelay(False)
 			break
 
@@ -426,6 +454,7 @@ def wpm_test(stdscr, modo):
 			if len(current_text) > 0:
 				current_text.pop()
 		elif len(current_text) < len(target_text):
+			text_changed = True
 			current_text.append(key)
 
 def display_estadisticas(stdscr):
@@ -441,6 +470,7 @@ def display_estadisticas(stdscr):
 	return promedio
 
 def main(stdscr):
+	global errors
 	curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
 	curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
 	curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -450,25 +480,26 @@ def main(stdscr):
 	total_wpm = 0
 
 	while modo != "7":
-		if modo == "1":
+		errors = 0
+		if modo == "1": # Cantidad de palabras
 			total_wpm = wpm_test(stdscr, modo)
 			stdscr.clear()
 			save_results(total_wpm)
-			stdscr.addstr(1,0,f"Your speed was: {total_wpm} wpm")
-			# stdscr.addstr(2,0,f"You had {errors} errors")
-			stdscr.addstr(3, 0, "You completed the text! Press any key to continue...")
+			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
+			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
+			stdscr.addstr(4, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 		
-		if modo == "2":
+		if modo == "2": # Frase aleatoria
 			total_wpm = wpm_test(stdscr, modo)
 			stdscr.clear()
 			save_results(total_wpm)
-			stdscr.addstr(1,0,f"Your speed was: {total_wpm} wpm")
-			# stdscr.addstr(2,0,f"You had {errors} errors")
-			stdscr.addstr(3, 0, "You completed the text! Press any key to continue...")
+			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
+			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
+			stdscr.addstr(4, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 			
-		if modo == "3":
+		if modo == "3": # Contrarreloj
 			stdscr.clear()
 			total_wpm=timed_test(stdscr)
 			stdscr.clear()
@@ -476,28 +507,31 @@ def main(stdscr):
 			# stdscr.nodelay(True)
 			# time.sleep(1)
 			# stdscr.clear()
-			stdscr.addstr(1,0,f"Your speed was: {total_wpm} wpm")
-			# stdscr.addstr(2,0,f"You had {errors} errors")
-			stdscr.addstr(3, 0, "You completed the text! Press any key to continue...")
+			stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
+			stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
+			stdscr.addstr(4, 0, "You completed the text! Press any key to continue...")
 			stdscr.getkey()
 
-		if modo == "4":
+		if modo == "4": # Escribir un libro
 			book = book_menu(stdscr)
 
 			if book != -1:
-				write_book(stdscr, book)
+				total_wpm = write_book(stdscr, book)
 				stdscr.clear()
-				stdscr.addstr("\nPress any key to continue...")
+				save_results(total_wpm)
+				stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
+				stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
+				stdscr.addstr(4, 0, "Press any key to continue...")
 				stdscr.getkey()
 				stdscr.clear()
 
-		if modo == "5":
+		if modo == "5": # Configuracion
 			configuration(stdscr)
 			stdscr.clear()
 		
-		if modo == "6":
+		if modo == "6": # Estadísticas
 			stdscr.clear()
-			stdscr.addstr(1, 0, "Estadisticas historicas")
+			stdscr.addstr(1, 0, "Statistics")
 			promedio = display_estadisticas(stdscr)
 			# stdscr.addstr(1, 0, "Estadisticas historicas")
 
