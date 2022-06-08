@@ -1,9 +1,8 @@
 from abc import ABCMeta, abstractmethod
 import time
+from Text import Text
 from ProxyUserDataLoader import ProxyUserDataLoader
 from RealUserDataLoader import RealUserDataLoader
-
-from utils import Utils
 
 class Test(metaclass=ABCMeta):
     @abstractmethod
@@ -12,9 +11,9 @@ class Test(metaclass=ABCMeta):
 
 class WPMTest(Test):
     def displayTest(self, stdscr, mode, char_count, errors):
-        utils = Utils()
+        text = Text()
 
-        target_text = utils.load_text(mode)
+        target_text = text.load_text(mode)
         char_count = len(target_text)
         current_text = []
         wpm = 0
@@ -34,7 +33,7 @@ class WPMTest(Test):
             wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
 
             stdscr.clear()
-            errors = utils.display_text(stdscr, target_text, current_text, text_changed, errors, wpm)
+            errors = text.display_text(stdscr, target_text, current_text, text_changed, errors, wpm)
             text_changed = False
             stdscr.refresh()
 
@@ -70,14 +69,14 @@ class WPMTest(Test):
 
 class TimedTest(Test):
     def displayTest(self, stdscr, mode, char_count, errors):
-        utils = Utils()
+        text = Text()
 
         real = RealUserDataLoader()
         userDataLoader = ProxyUserDataLoader(real)
         userData = userDataLoader.getUserData()
         countdown_time = userData.get_time_limit()
 
-        target_text = utils.load_text("3")
+        target_text = text.load_text("3")
         current_text = []
         wpm = 0
         text_changed = False
@@ -94,14 +93,14 @@ class TimedTest(Test):
             wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
 
             stdscr.clear()
-            errors = utils.display_text(stdscr, target_text, current_text, text_changed, errors, wpm)
+            errors = text.display_text(stdscr, target_text, current_text, text_changed, errors, wpm)
             text_changed = False
             stdscr.addstr(5, 0, f"Remaining time: {countdown_time} seconds\n");
             stdscr.move(0, 0)
             stdscr.refresh()
 
             if "".join(current_text) == target_text:
-                target_text = utils.load_text("3")
+                target_text = text.load_text("3")
                 current_text = []
 
             if countdown_time <= 0:

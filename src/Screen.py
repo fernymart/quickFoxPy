@@ -3,8 +3,9 @@ import curses
 from curses import newwin, wrapper
 from ProxyUserDataLoader import ProxyUserDataLoader
 from RealUserDataLoader import RealUserDataLoader
+from Stats import Stats
+from Twitter import Twitter
 from connection import GameDB
-from utils import Utils
 
 class Screen(metaclass=ABCMeta):
     @abstractmethod
@@ -22,11 +23,12 @@ class WelcomeScreen(Screen):
 
 class StatisticsScreen(Screen):
     def display(self, stdscr):
-        utils = Utils()
+        stats = Stats()
+        twitter = Twitter()
 
         stdscr.clear()
         stdscr.addstr(1, 0, "Statistics")
-        promedio, promedio_chars = utils.display_estadisticas(stdscr)
+        promedio, promedio_chars = stats.display_estadisticas(stdscr)
 
         stdscr.addstr("\n\nPress 1 to share your statistics on Twitter.")
         stdscr.addstr("\nPress 2 to share your statistics with other users of this app.")
@@ -54,9 +56,9 @@ class StatisticsScreen(Screen):
 
                 key = stdscr.getkey()
                 if key == "1":
-                    utils.twitter_share(promedio, percentage)
+                    twitter.twitter_share(promedio, percentage)
         elif key == "1":
-            utils.twitter_share(promedio)
+            twitter.twitter_share(promedio)
 
 
 class ScreenFactory(object):

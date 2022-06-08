@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
 import curses
 from curses import newwin, wrapper
+from Color import Color
 from Config import Config
+from Input import Input
 from ProxyUserDataLoader import ProxyUserDataLoader
 from RealUserDataLoader import RealUserDataLoader
 from connection import GameDB
-from utils import Utils
 import webbrowser
 
 class Option(metaclass=ABCMeta):
@@ -20,14 +21,14 @@ class WordLimitOption(Option, Config):
         userData = userDataLoader.getUserData()
         word_limit = userData.get_word_limit()
 
-        utils = Utils()
+        input = Input()
         
         stdscr.clear()
         stdscr.addstr("Word Limit: \n")
         stdscr.addstr("Current limit: ")
         stdscr.addstr(str(word_limit))
         stdscr.addstr("\nSet new limit (max. 3 digits): ")
-        s = utils.get_input(stdscr, 3)
+        s = input.get_input(stdscr, 3)
 
         try:
             if s != "-1":
@@ -43,14 +44,14 @@ class TimeLimitOption(Option, Config):
         userData = userDataLoader.getUserData()
         time_limit = userData.get_time_limit()
         
-        utils = Utils()
+        input = Input()
 
         stdscr.clear()
         stdscr.addstr("Time Limit: \n")
         stdscr.addstr("Current limit: ")
         stdscr.addstr(str(time_limit))
         stdscr.addstr("\nSet new limit (max. 3 digits): ")
-        s = utils.get_input(stdscr, 3)
+        s = input.get_input(stdscr, 3)
 
         try:
             if s != "-1":
@@ -65,7 +66,7 @@ class UsernameOption(Option):
         userDataLoader = ProxyUserDataLoader(real)
         userData = userDataLoader.getUserData()
 
-        utils = Utils()
+        input = Input()
         game_db = GameDB()
 
         stdscr.clear()
@@ -75,7 +76,7 @@ class UsernameOption(Option):
             stdscr.addstr("Create username (max. 10 characters): ")
 
             while id is None:
-                newuser = utils.get_input(stdscr, 10)
+                newuser = input.get_input(stdscr, 10)
 
                 if newuser == "-1": break
 
@@ -102,7 +103,7 @@ class UsernameOption(Option):
         else:
             stdscr.addstr("Your current username is " + user)
             stdscr.addstr("\n\nEnter your new username (max. 10 characters): ")
-            newuser = utils.get_input(stdscr, 10)
+            newuser = input.get_input(stdscr, 10)
 
             if newuser != "-1":
                 newuser = newuser.strip()
@@ -114,7 +115,7 @@ class UsernameOption(Option):
                     stdscr.addstr("Your current username is " + user)
                     stdscr.addstr(user)
                     stdscr.addstr("\n\nNew username: ")
-                    newuser = utils.get_input(stdscr, 10)
+                    newuser = input.get_input(stdscr, 10)
 
                     newuser = newuser.strip()
 
@@ -135,12 +136,12 @@ class WrongColorOption(Option, Config):
         userDataLoader = ProxyUserDataLoader(real)
         userData = userDataLoader.getUserData()
 
-        utils = Utils()
+        color = Color()
 
         stdscr.clear()
         stdscr.addstr("Wrong Color: \n")
-        new_color = utils.color_options(stdscr)
-        utils.set_color(2, new_color)
+        new_color = color.color_options(stdscr)
+        color.set_color(2, new_color)
         userData.change_color_opt(2, new_color)
 
 class RightColorOption(Option, Config):
@@ -149,12 +150,12 @@ class RightColorOption(Option, Config):
         userDataLoader = ProxyUserDataLoader(real)
         userData = userDataLoader.getUserData()
 
-        utils = Utils()
+        color = Color()
 
         stdscr.clear()
         stdscr.addstr("Right Color: \n")
-        new_color = utils.color_options(stdscr)
-        utils.set_color(1, new_color)
+        new_color = color.color_options(stdscr)
+        color.set_color(1, new_color)
         userData.change_color_opt(1, new_color)
 
 class FeedbackOption(Option):
