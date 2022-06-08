@@ -5,9 +5,10 @@ import time
 import random
 import webbrowser
 from emoji import emojize
+from Config import ConfigEnvironment
 import Generator
 from Menu import MenuFactory
-from Option import OptionFactory
+from Option import OptionFactory, RightColorOption, TimeLimitOption, WordLimitOption, WrongColorOption
 from PhraseMode import PhraseMode
 from Results import ResultsFactory
 from Screen import ScreenFactory
@@ -76,7 +77,12 @@ def main(stdscr):
                 if key == '6':
                     optionFactory.create_screen('FeedbackOption', stdscr)
                 if key == '7':
-                    pass
+                    configEnvironment = ConfigEnvironment()
+                    configEnvironment.addConfig(WordLimitOption())
+                    configEnvironment.addConfig(TimeLimitOption())
+                    configEnvironment.addConfig(RightColorOption())
+                    configEnvironment.addConfig(WrongColorOption())
+                    configEnvironment.configEnvironment(stdscr)
 
                 key = menuFactory.create_screen('ConfigMenu', stdscr)
         if mode == "6":

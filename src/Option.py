@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import curses
 from curses import newwin, wrapper
+from Config import Config
 from ProxyUserDataLoader import ProxyUserDataLoader
 from RealUserDataLoader import RealUserDataLoader
 from connection import GameDB
@@ -12,7 +13,7 @@ class Option(metaclass=ABCMeta):
     def displayOption(self, stdscr):
         pass
 
-class WordLimitOption(Option):
+class WordLimitOption(Option, Config):
     def displayOption(self, stdscr):
         real = RealUserDataLoader()
         userDataLoader = ProxyUserDataLoader(real)
@@ -22,6 +23,7 @@ class WordLimitOption(Option):
         utils = Utils()
         
         stdscr.clear()
+        stdscr.addstr("Word Limit: \n")
         stdscr.addstr("Current limit: ")
         stdscr.addstr(str(word_limit))
         stdscr.addstr("\nSet new limit (max. 3 digits): ")
@@ -34,7 +36,7 @@ class WordLimitOption(Option):
             stdscr.addstr("\nError. The value must be numeric")
             stdscr.getkey()
 
-class TimeLimitOption(Option):
+class TimeLimitOption(Option, Config):
     def displayOption(self, stdscr):
         real = RealUserDataLoader()
         userDataLoader = ProxyUserDataLoader(real)
@@ -44,6 +46,7 @@ class TimeLimitOption(Option):
         utils = Utils()
 
         stdscr.clear()
+        stdscr.addstr("Time Limit: \n")
         stdscr.addstr("Current limit: ")
         stdscr.addstr(str(time_limit))
         stdscr.addstr("\nSet new limit (max. 3 digits): ")
@@ -66,6 +69,7 @@ class UsernameOption(Option):
         game_db = GameDB()
 
         stdscr.clear()
+        stdscr.addstr("Username: \n")
         id, user = userData.get_user()
         if id is None:
             stdscr.addstr("Create username (max. 10 characters): ")
@@ -125,7 +129,7 @@ class UsernameOption(Option):
                 stdscr.addstr("\nUsername changed successfully.")
                 stdscr.getkey()
 
-class WrongColorOption(Option):
+class WrongColorOption(Option, Config):
     def displayOption(self, stdscr):
         real = RealUserDataLoader()
         userDataLoader = ProxyUserDataLoader(real)
@@ -134,11 +138,12 @@ class WrongColorOption(Option):
         utils = Utils()
 
         stdscr.clear()
+        stdscr.addstr("Wrong Color: \n")
         new_color = utils.color_options(stdscr)
         utils.set_color(2, new_color)
         userData.change_color_opt(2, new_color)
 
-class RightColorOption(Option):
+class RightColorOption(Option, Config):
     def displayOption(self, stdscr):
         real = RealUserDataLoader()
         userDataLoader = ProxyUserDataLoader(real)
@@ -147,6 +152,7 @@ class RightColorOption(Option):
         utils = Utils()
 
         stdscr.clear()
+        stdscr.addstr("Right Color: \n")
         new_color = utils.color_options(stdscr)
         utils.set_color(1, new_color)
         userData.change_color_opt(1, new_color)
@@ -155,8 +161,11 @@ class FeedbackOption(Option):
     def displayOption(self, stdscr):
         url = "mailto:?to=A01197148@tec.mx&subject=Feedback speed test app"
         webbrowser.open(url, new=0, autoraise=True)
-        
 
+class EnvironmentOption(Option):
+    def displayOption(self, stdscr):
+        pass
+        
 class OptionFactory(object):
     def create_screen(self, screen_name, stdscr):
         return eval(screen_name)().displayOption(stdscr)

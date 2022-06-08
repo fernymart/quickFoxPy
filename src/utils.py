@@ -88,6 +88,22 @@ class Utils():
         elif color == 5:
             curses.init_pair(type, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
+    def color_options(self, stdscr):
+        colors = ["red", "green", "yellow", "blue", "magenta", "cyan"]
+        for i in range(0, len(colors)):
+            stdscr.addstr(f"{i + 1}. {colors[i]}\n")
+
+        stdscr.addstr("7. Go back\n")
+        key = stdscr.getkey()
+
+        if key == "7":
+            return -1
+
+        try:
+            return int(key) - 1
+        except:
+            return -1
+
     def display_estadisticas(self, stdscr):
         real = RealUserDataLoader()
         userDataLoader = ProxyUserDataLoader(real)
