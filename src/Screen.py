@@ -1,69 +1,64 @@
 from abc import ABCMeta, abstractmethod
 import curses
 from curses import newwin, wrapper
-from UserData import UserData
-
-user_data = UserData()
-books = user_data.get_books()
-
-total_wpm = ''
-errors = ''
-char_count = ''
-
-def twitter_share(wpm, errors = None, char_count = None):
-	if char_count is not None:
-		url = f"http://twitter.com/share?text=Today my speed was {wpm} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0AI made {errors} mistakes in {char_count} characters%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
-	elif errors is not None:
-		url = f"http://twitter.com/share?text=My average speed is {wpm:.2f} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0AI am faster than {errors:.2f}%25 of players.{emojize(':zap:', language='alias')}%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
-	else:
-		url = f"http://twitter.com/share?text=My average speed is {wpm:.2f} wpm {emojize(':muscle::grinning_face::computer:', language='alias')}%0A%0ACan you beat me?{emojize(':flushed:', language='alias')}https://github.com/fernymart/quickFoxPy"
-	webbrowser.open(url, new=0, autoraise=True)
+from ProxyUserDataLoader import ProxyUserDataLoader
+from RealUserDataLoader import RealUserDataLoader
+from connection import GameDB
+from utils import Utils
 
 class Screen(metaclass=ABCMeta):
     @abstractmethod
     def display(self, stdscr):
         pass
 
-class Welcome(Screen):
+class WelcomeScreen(Screen):
     def display(self, stdscr):
         stdscr.clear()
         stdscr.addstr("Welcome to the Speed Typing Test!")
         stdscr.addstr("\nPress any key to begin!")
         stdscr.refresh()
         stdscr.getkey()
-
         return
 
-class ResultsScreen(Screen):
+class StatisticsScreen(Screen):
     def display(self, stdscr):
-        stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
-        stdscr.addstr(2, 0,f"You made {errors} mistakes when writing a total of {char_count} characters.")
-        stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
-        key = stdscr.getkey()
-        if key == "1":
-            twitter_share(total_wpm, errors, char_count)
+        utils = Utils()
 
-class TypeScreen(Screen):
-    def display(self, stdscr):
         stdscr.clear()
-        stdscr.addstr("Settings\n")
-        stdscr.addstr("1. Change word limit\n")
-        stdscr.addstr("2. Change time limit\n")
-        stdscr.addstr("3. Change username\n")
-        stdscr.addstr("4. Change wrong character color\n")
-        stdscr.addstr("5. Change correct character color\n")
-        stdscr.addstr("6. Send feedback\n")
-        stdscr.addstr("7. Go Back\n")
+        stdscr.addstr(1, 0, "Statistics")
+        promedio, promedio_chars = utils.display_estadisticas(stdscr)
 
+        stdscr.addstr("\n\nPress 1 to share your statistics on Twitter.")
+        stdscr.addstr("\nPress 2 to share your statistics with other users of this app.")
+        stdscr.addstr("\n\nPress any other key to return to main menu...")
         key = stdscr.getkey()
-        return key
+
+        if key == "2":
+            real = RealUserDataLoader()
+            userDataLoader = ProxyUserDataLoader(real)
+            userData = userDataLoader.getUserData()
+            id, user = userData.get_user()
+
+            if id is None:
+                stdscr.addstr("\n\nIt seems like you do not have a registered user. Please, register one in the settings.")
+                stdscr.getkey()
+            else:
+                game_db = GameDB()
+                game_db.post_stats(id, promedio, promedio_chars)
+                percentage, percentage_chars = game_db.get_stats(promedio, promedio_chars)
+
+                stdscr.addstr(f"\n\nIn terms of speed, you are above the {percentage:.2f}% of the users of this app.")
+                stdscr.addstr(f"\nIn terms of number of mistakes made, you are above the {percentage_chars:.2f}% of the users of this app.")
+                stdscr.addstr(f"\n\nPress 1 to share on Twitter.")
+                stdscr.addstr("\nPress any other key to return to main menu...")
+
+                key = stdscr.getkey()
+                if key == "1":
+                    utils.twitter_share(promedio, percentage)
+        elif key == "1":
+            utils.twitter_share(promedio)
+
 
 class ScreenFactory(object):
     def create_screen(self, screen_name, stdscr):
         return eval(screen_name)().display(stdscr)
-
-def main(stdscr):
-    fabric =  ScreenFactory()
-    fabric.create_screen('ConfigMenu', stdscr)
-
-wrapper(main)
