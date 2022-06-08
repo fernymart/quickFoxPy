@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
-
-from SaveResults import SaveResults
-from Twitter import Twitter
+from Utils.SaveResults import SaveResults
+from Utils.Twitter import Twitter
 
 class Results(metaclass=ABCMeta):
     @abstractmethod

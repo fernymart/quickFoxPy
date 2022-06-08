@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from Generator import Generator
-from UserData import UserData
 import random
+from Utils.Generator import Generator
+from VirtualProxy.UserData import UserData
 
 class AbstractMode(metaclass=ABCMeta):
 
@@ -36,7 +36,7 @@ class NumpadMode(AbstractMode):
 class PhraseMode(AbstractMode):
 
     def loadText(self):
-        with open("text.txt", "r") as f:
+        with open("../files/text.txt", "r") as f:
             lines = f.readlines()
         return random.choice(lines).strip()
 

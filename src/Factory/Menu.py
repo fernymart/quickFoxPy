@@ -1,8 +1,4 @@
 from abc import ABCMeta, abstractmethod
-import curses
-from curses import newwin, wrapper
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
 
 class Menu(metaclass=ABCMeta):
     @abstractmethod

@@ -1,5 +1,5 @@
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
 
 class Stats():
     def display_estadisticas(self, stdscr):

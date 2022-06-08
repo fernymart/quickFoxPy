@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractmethod
 import time
-from Text import Text
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
+from Utils.Text import Text
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
 
 class Test(metaclass=ABCMeta):
     @abstractmethod

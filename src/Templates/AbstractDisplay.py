@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from Results import ResultsFactory
-
-from Test import TestFactory
+from Factory.Results import ResultsFactory
+from Factory.Test import TestFactory
 
 
 class AbstractDisplay(metaclass=ABCMeta):

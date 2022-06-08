@@ -1,5 +1,5 @@
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
 
 class SaveResults():
     def save_results(self, wpm, errors, char_count):

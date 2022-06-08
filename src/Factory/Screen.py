@@ -1,11 +1,9 @@
 from abc import ABCMeta, abstractmethod
-import curses
-from curses import newwin, wrapper
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
-from Stats import Stats
-from Twitter import Twitter
-from connection import GameDB
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
+from Utils.Stats import Stats
+from Utils.Twitter import Twitter
+from Database.connection import GameDB
 
 class Screen(metaclass=ABCMeta):
     @abstractmethod

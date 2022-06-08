@@ -1,5 +1,5 @@
-from UserDataLoader import UserDataLoader
-from UserData import UserData
+from VirtualProxy.UserDataLoader import UserDataLoader
+from VirtualProxy.UserData import UserData
 
 class RealUserDataLoader(UserDataLoader):
     def getUserData(self):

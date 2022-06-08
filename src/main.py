@@ -1,17 +1,12 @@
-import curses
-from curses import newwin, wrapper
-from re import S
-from emoji import emojize
-from AbstractDisplay import TimedDisplay, WPMDisplay
-from Color import Color
-from Config import ConfigEnvironment
-from Menu import MenuFactory
-from Option import OptionFactory, RightColorOption, TimeLimitOption, WordLimitOption, WrongColorOption
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
-from Screen import ScreenFactory
-from UserData import UserData
-from connection import GameDB
+from curses import wrapper
+from Templates.AbstractDisplay import TimedDisplay, WPMDisplay
+from Utils.Color import Color
+from Command.Config import ConfigEnvironment
+from Factory.Menu import MenuFactory
+from Factory.Option import OptionFactory, RightColorOption, TimeLimitOption, WordLimitOption, WrongColorOption
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
+from Factory.Screen import ScreenFactory
 
 errors = 0
 char_count = 0

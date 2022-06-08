@@ -1,8 +1,7 @@
 import curses
-from AbstractMode import NumpadMode, PhraseMode, TimeraceMode, WordsMode
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
-
+from Templates.AbstractMode import NumpadMode, PhraseMode, TimeraceMode, WordsMode
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
 
 class Text():
     def load_text(self, modo):

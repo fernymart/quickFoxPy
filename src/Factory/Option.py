@@ -1,12 +1,10 @@
 from abc import ABCMeta, abstractmethod
-import curses
-from curses import newwin, wrapper
-from Color import Color
-from Config import Config
-from Input import Input
-from ProxyUserDataLoader import ProxyUserDataLoader
-from RealUserDataLoader import RealUserDataLoader
-from connection import GameDB
+from Utils.Color import Color
+from Command.Config import Config
+from Utils.Input import Input
+from VirtualProxy.ProxyUserDataLoader import ProxyUserDataLoader
+from VirtualProxy.RealUserDataLoader import RealUserDataLoader
+from Database.connection import GameDB
 import webbrowser
 
 class Option(metaclass=ABCMeta):
