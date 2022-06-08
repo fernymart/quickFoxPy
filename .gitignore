@@ -1,6 +1,4 @@
 /env
 __pycache__/
-test.py
 /files/results.txt
 /files/wrong_chars.txt
-user-data.json

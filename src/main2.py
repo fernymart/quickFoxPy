@@ -5,6 +5,7 @@ import time
 import random
 import webbrowser
 from emoji import emojize
+from AbstractDisplay import TimedDisplay, WPMDisplay
 from Config import ConfigEnvironment
 import Generator
 from Menu import MenuFactory
@@ -30,8 +31,6 @@ def main(stdscr):
 
     screenFactory = ScreenFactory()
     menuFactory = MenuFactory()
-    resultsFactory = ResultsFactory()
-    testFactory = TestFactory()
     optionFactory = OptionFactory()
 
     color_correct, color_incorrect = user_data.get_colors()
@@ -46,21 +45,17 @@ def main(stdscr):
         errors = 0
 
         if mode == "1":
-            total_wpm, char_count, errors = testFactory.create_screen('WPMTest', stdscr, mode, char_count, errors)
-            stdscr.clear()
-            resultsFactory.create_screen('ResultsScreen', stdscr, total_wpm, errors, char_count)
+            wpmDisplay = WPMDisplay()
+            wpmDisplay.render(stdscr, mode, char_count, errors)
         if mode == '2':
-            total_wpm, char_count, errors = testFactory.create_screen('WPMTest', stdscr, mode, char_count, errors)
-            stdscr.clear()
-            resultsFactory.create_screen('ResultsScreen', stdscr, total_wpm, errors, char_count)
+            wpmDisplay = WPMDisplay()
+            wpmDisplay.render(stdscr, mode, char_count, errors)
         if mode == '3':
-            total_wpm, char_count, errors = testFactory.create_screen('TimedTest', stdscr, mode, char_count, errors)
-            stdscr.clear()
-            resultsFactory.create_screen('ResultsScreen', stdscr, total_wpm, errors, char_count)
+            wpmDisplay = TimedDisplay()
+            wpmDisplay.render(stdscr, mode, char_count, errors)
         if mode == "4":
-            total_wpm, char_count, errors = testFactory.create_screen('WPMTest', stdscr, mode, char_count, errors)
-            stdscr.clear()
-            resultsFactory.create_screen('ResultsScreen', stdscr, total_wpm, errors, char_count)
+            wpmDisplay = WPMDisplay()
+            wpmDisplay.render(stdscr, mode, char_count, errors)
         if mode == "5":
             key = menuFactory.create_screen('ConfigMenu', stdscr)
             while key != "8":
