@@ -3320,9 +3320,6 @@ frost
 frozen
 fruit
 fruits
-fuck
-fucked
-fucking
 fuel
 fuji
 fujitsu
@@ -7130,8 +7127,6 @@ seventh
 several
 severe
 sewing
-sexcam
-sexo
 sexual
 sexuality
 sexually
@@ -8396,7 +8391,6 @@ vacation
 vacations
 vaccine
 vacuum
-vagina
 valentine
 valid
 validation
