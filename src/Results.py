@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from SaveResults import SaveResults
+from Twitter import Twitter
 
 class Results(metaclass=ABCMeta):
     @abstractmethod
@@ -10,6 +11,7 @@ class Results(metaclass=ABCMeta):
 class ResultsScreen(Results):
     def displayResults(self, stdscr, total_wpm, errors, char_count):
         save = SaveResults()
+        twitter = Twitter()
         stdscr.clear()
         save.save_results(total_wpm, errors, char_count)
         stdscr.addstr(1, 0,f"Your speed was: {total_wpm} wpm")
@@ -17,7 +19,7 @@ class ResultsScreen(Results):
         stdscr.addstr(4, 0, "You completed the text! \nPress 1 to share on Twitter or any other key to continue...")
         key = stdscr.getkey()
         if key == "1":
-            save.twitter_share(total_wpm, errors, char_count)
+            twitter.twitter_share(total_wpm, errors, char_count)
 
 class ResultsFactory(object):
     def create_screen(self, screen_name, stdscr, total_wpm, errors, char_count):
